@@ -1,0 +1,260 @@
+# Implementation Plan
+
+- [ ] 1. Project Setup and Configuration
+  - [ ] 1.1 Set up backend Express.js project structure
+    - Create backend directory with Express.js boilerplate (JavaScript)
+    - Configure ESLint and Prettier for JavaScript
+    - Set up Supabase client configuration
+    - Add environment variables template (.env.example)
+    - _Requirements: 10.1, 10.4_
+  - [ ] 1.2 Configure frontend Next.js project
+    - Update existing Next.js project with App Router structure (JavaScript)
+    - Configure Tailwind CSS with custom color palette from design (purple gradients, teal buttons)
+    - Set up fast-check for property-based testing
+    - Add Jest and React Testing Library configuration
+    - _Requirements: 10.1, 10.2_
+  - [ ] 1.3 Set up Supabase database schema
+    - Create users, auth_tokens, vinyl_designs, and error_logs tables
+    - Configure Row Level Security (RLS) policies
+    - Set up Supabase Storage bucket for custom images
+    - _Requirements: 10.4_
+
+- [ ] 2. Authentication System
+  - [ ] 2.1 Implement Spotify OAuth flow
+    - Create /api/auth/spotify endpoint for OAuth initiation
+    - Create /api/auth/callback endpoint for handling Spotify callback
+    - Store tokens securely in Supabase auth_tokens table
+    - _Requirements: 1.3, 1.5_
+  - [ ] 2.2 Implement Apple Music OAuth flow
+    - Create /api/auth/apple endpoint for OAuth initiation
+    - Handle Apple Music authorization callback
+    - Store tokens in Supabase
+    - _Requirements: 1.4, 1.5_
+  - [ ] 2.3 Implement token refresh mechanism
+    - Create /api/auth/refresh endpoint
+    - Implement automatic token refresh before expiration
+    - Update stored tokens in Supabase
+    - _Requirements: 1.6_
+  - [ ]* 2.4 Write property test for token refresh
+    - **Property 1: Token Refresh Preserves Authentication**
+    - **Validates: Requirements 1.6**
+  - [ ] 2.5 Implement logout functionality
+    - Create /api/auth/logout endpoint
+    - Clear tokens from Supabase and client state
+    - _Requirements: 1.7_
+
+- [ ] 3. Welcome and Splash Screen
+  - [ ] 3.1 Create SplashScreen component
+    - Implement animated Groove vinyl logo
+    - Add purple-to-pink gradient background
+    - Trigger transition callback after animation completes
+    - _Requirements: 1.1, 9.1_
+  - [ ] 3.2 Create WelcomeScreen component
+    - Display "Connect with Spotify" button
+    - Display "Connect with Apple Music" button
+    - Apply gradient background styling
+    - _Requirements: 1.2, 9.1_
+  - [ ] 3.3 Implement authentication button handlers
+    - Connect buttons to OAuth endpoints
+    - Handle loading and error states
+    - _Requirements: 1.3, 1.4_
+
+- [ ] 4. Navigation and Layout System
+  - [ ] 4.1 Create Header component
+    - Implement hamburger menu icon
+    - Display dynamic screen title (NOW PLAYING, MY SHELF, CREATE NEW)
+    - Apply dark header styling for Now Playing screen
+    - _Requirements: 6.1, 6.4, 6.5, 6.6_
+  - [ ] 4.2 Create NavigationMenu component
+    - Implement slide-out menu with navigation options
+    - Add smooth transition animations
+    - Handle menu open/close state
+    - _Requirements: 6.2, 6.3_
+  - [ ] 4.3 Set up App Router page structure
+    - Create /welcome route
+    - Create /now-playing route
+    - Create /my-shelf route
+    - Create /create-new route
+    - _Requirements: 10.1_
+
+- [ ] 5. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 6. My Shelf Screen - Playlist Collection
+  - [ ] 6.1 Create playlist API endpoints
+    - Implement GET /api/playlists to fetch user playlists
+    - Handle pagination for large playlist collections
+    - _Requirements: 2.1, 2.4_
+  - [ ] 6.2 Create VinylRecord component
+    - Render vinyl with black outer ring and grooves texture
+    - Display playlist cover as center label
+    - Implement default Groove logo for missing covers
+    - _Requirements: 2.2, 2.3, 9.5_
+  - [ ]* 6.3 Write property test for playlist rendering
+    - **Property 2: Playlist Rendering Consistency**
+    - **Validates: Requirements 2.2**
+  - [ ]* 6.4 Write property test for default cover fallback
+    - **Property 3: Default Cover Fallback**
+    - **Validates: Requirements 2.3**
+  - [ ] 6.5 Create VinylShelf component
+    - Arrange vinyl records on wooden shelf rows
+    - Apply light pink/cream background with wood textures
+    - Handle click navigation to Now Playing
+    - _Requirements: 2.2, 2.5, 9.3_
+  - [ ] 6.6 Create MyShelfScreen page
+    - Integrate VinylShelf with playlist data
+    - Add "Add New Vinyl" button with teal styling
+    - Implement infinite scroll for additional playlists
+    - _Requirements: 2.1, 2.6, 9.6_
+
+- [ ] 7. Now Playing Screen - Playback Interface
+  - [ ] 7.1 Create VinylTurntable component
+    - Render vinyl record on turntable base
+    - Display playlist cover as vinyl label
+    - Implement 33 RPM spinning animation (1.818s per rotation)
+    - _Requirements: 3.1, 5.4, 9.5_
+  - [ ]* 7.2 Write property test for vinyl label display
+    - **Property 4: Vinyl Label Display**
+    - **Validates: Requirements 3.1**
+  - [ ] 7.3 Implement seek/scrub functionality
+    - Handle drag interactions on vinyl record
+    - Calculate seek position from drag percentage
+    - Call playback API with seek time
+    - _Requirements: 3.4_
+  - [ ]* 7.4 Write property test for seek position mapping
+    - **Property 5: Seek Position Mapping**
+    - **Validates: Requirements 3.4**
+  - [ ] 7.5 Create PlaybackControls component
+    - Implement play/pause button with state toggle
+    - Implement skip forward button
+    - Implement skip backward button with 3-second threshold logic
+    - _Requirements: 3.2, 3.3, 3.5, 3.6_
+  - [ ]* 7.6 Write property test for skip forward
+    - **Property 6: Skip Forward Track Advancement**
+    - **Validates: Requirements 3.5**
+  - [ ]* 7.7 Write property test for skip backward behavior
+    - **Property 7: Skip Backward Behavior**
+    - **Validates: Requirements 3.6**
+  - [ ] 7.8 Create TrackQueue component
+    - Display list of tracks with names and artists
+    - Highlight current track
+    - Add "View All" button for full playlist view
+    - _Requirements: 3.7, 3.8_
+  - [ ]* 7.9 Write property test for track queue completeness
+    - **Property 8: Track Queue Completeness**
+    - **Validates: Requirements 3.7**
+  - [ ] 7.10 Create TrackInfo component
+    - Display current track name and artist
+    - Show progress indicator
+    - _Requirements: 5.1, 5.2_
+  - [ ]* 7.11 Write property test for track info display
+    - **Property 12: Track Info Display**
+    - **Validates: Requirements 5.1**
+  - [ ] 7.12 Create NowPlayingScreen page
+    - Integrate all playback components
+    - Apply pink/lavender gradient background
+    - Connect to playback state management
+    - _Requirements: 3.1, 9.2_
+
+- [ ] 8. Playback API Integration
+  - [ ] 8.1 Implement playback service endpoints
+    - Create POST /api/playback/play endpoint
+    - Create POST /api/playback/pause endpoint
+    - Create POST /api/playback/seek endpoint
+    - Create POST /api/playback/skip endpoint
+    - Create GET /api/playback/state endpoint
+    - _Requirements: 3.2, 3.3, 3.4, 3.5, 3.6_
+  - [ ] 8.2 Create usePlayback hook
+    - Manage playback state (isPlaying, currentTrack, progress)
+    - Handle real-time progress updates
+    - Sync with Spotify/Apple Music playback state
+    - _Requirements: 5.3_
+
+- [ ] 9. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 10. Create New Screen - Vinyl Customization
+  - [ ] 10.1 Create ColorPicker component
+    - Display color palette options
+    - Handle color selection with real-time preview update
+    - _Requirements: 4.3_
+  - [ ]* 10.2 Write property test for color picker
+    - **Property 9: Color Picker Real-time Update**
+    - **Validates: Requirements 4.3**
+  - [ ] 10.3 Create ImageGallery component
+    - Display preset image options
+    - Handle image selection for vinyl label
+    - _Requirements: 4.4_
+  - [ ]* 10.4 Write property test for image selection
+    - **Property 10: Image Selection Application**
+    - **Validates: Requirements 4.4**
+  - [ ] 10.5 Implement image upload functionality
+    - Create file input with drag-and-drop support
+    - Validate image format (JPEG, PNG) and size (max 4MB)
+    - Upload to Supabase Storage
+    - _Requirements: 4.5_
+  - [ ]* 10.6 Write property test for image validation
+    - **Property 11: Image Upload Validation**
+    - **Validates: Requirements 4.5**
+  - [ ] 10.7 Create VinylPreview component
+    - Display real-time vinyl preview with selected color and image
+    - Update preview on customization changes
+    - _Requirements: 4.2_
+  - [ ] 10.8 Create VinylCreator component
+    - Integrate ColorPicker, ImageGallery, and VinylPreview
+    - Add playlist name input field
+    - Add "Create Playlist" button with teal styling
+    - _Requirements: 4.1, 4.6, 9.6_
+  - [ ] 10.9 Implement playlist creation API
+    - Create POST /api/playlists endpoint
+    - Create playlist via Spotify/Apple Music API
+    - Store vinyl design metadata in Supabase
+    - _Requirements: 4.6, 4.7_
+  - [ ] 10.10 Create CreateNewScreen page
+    - Integrate VinylCreator component
+    - Apply light gray/white background
+    - Handle success and error states
+    - _Requirements: 4.1, 4.7, 4.8, 9.4_
+
+- [ ] 11. Error Handling System
+  - [ ] 11.1 Implement backend error middleware
+    - Create error logging to Supabase error_logs table
+    - Return appropriate error responses with retry information
+    - _Requirements: 7.3_
+  - [ ]* 11.2 Write property test for error logging
+    - **Property 13: Error Logging Completeness**
+    - **Validates: Requirements 7.3**
+  - [ ] 11.3 Create ErrorBoundary component
+    - Catch component-level errors
+    - Display user-friendly error messages
+    - Provide retry option for retryable errors
+    - _Requirements: 7.1_
+  - [ ] 11.4 Implement network status detection
+    - Create useNetworkStatus hook
+    - Display offline notification when connectivity lost
+    - _Requirements: 7.2_
+  - [ ] 11.5 Implement rate limit handling
+    - Detect 429 responses from APIs
+    - Queue requests and display delay notification
+    - _Requirements: 7.5_
+
+- [ ] 12. Responsive Design Implementation
+  - [ ] 12.1 Implement mobile layout (< 768px)
+    - Optimize vinyl player size for mobile
+    - Ensure touch-friendly button sizes
+    - _Requirements: 8.1_
+  - [ ] 12.2 Implement tablet layout (768px - 1024px)
+    - Scale vinyl player and shelves appropriately
+    - Adjust grid spacing
+    - _Requirements: 8.2_
+  - [ ] 12.3 Implement desktop layout (> 1024px)
+    - Display expanded shelf view with larger vinyls
+    - Optimize spacing for larger screens
+    - _Requirements: 8.3_
+  - [ ] 12.4 Implement touch gesture support
+    - Add swipe gestures for track navigation
+    - Ensure tap interactions work correctly
+    - _Requirements: 8.5_
+
+- [ ] 13. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
