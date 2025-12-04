@@ -30,28 +30,28 @@ export default function TrackQueue({
 
   if (tracks.length === 0) {
     return (
-      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-        <h3 className="text-white font-semibold mb-2">Up Next</h3>
-        <p className="text-white/60 text-sm">No tracks in queue</p>
+      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4">
+        <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">Up Next</h3>
+        <p className="text-white/60 text-xs sm:text-sm">No tracks in queue</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-white font-semibold">Up Next</h3>
+    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4">
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
+        <h3 className="text-white font-semibold text-sm sm:text-base">Up Next</h3>
         {hasMoreTracks && (
           <button
             onClick={onViewAll}
-            className="text-teal-primary text-sm font-medium hover:text-teal-primary/80 transition-colors"
+            className="text-teal-primary text-xs sm:text-sm font-medium hover:text-teal-primary/80 active:text-teal-primary/70 transition-colors touch-target px-2 py-1"
           >
             View All
           </button>
         )}
       </div>
 
-      <ul className="space-y-2">
+      <ul className="space-y-1 sm:space-y-2">
         {visibleTracks.map((track, index) => {
           const actualIndex = currentIndex + index;
           const isCurrent = index === 0;
@@ -60,18 +60,18 @@ export default function TrackQueue({
             <li key={track.id || actualIndex}>
               <button
                 onClick={() => onTrackSelect(actualIndex)}
-                className={`w-full flex items-center gap-3 p-2 rounded-lg transition-colors ${
+                className={`w-full flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-lg transition-colors touch-target ${
                   isCurrent 
                     ? 'bg-white/20' 
-                    : 'hover:bg-white/10'
+                    : 'hover:bg-white/10 active:bg-white/15'
                 }`}
               >
                 {/* Track Number or Playing Indicator */}
-                <span className={`w-6 text-center text-sm ${
+                <span className={`w-5 sm:w-6 text-center text-xs sm:text-sm flex-shrink-0 ${
                   isCurrent ? 'text-teal-primary' : 'text-white/50'
                 }`}>
                   {isCurrent ? (
-                    <svg className="w-4 h-4 mx-auto" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4 mx-auto" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z" />
                     </svg>
                   ) : (
@@ -81,7 +81,7 @@ export default function TrackQueue({
 
                 {/* Track Info */}
                 <div className="flex-1 min-w-0 text-left">
-                  <p className={`text-sm font-medium truncate ${
+                  <p className={`text-xs sm:text-sm font-medium truncate ${
                     isCurrent ? 'text-white' : 'text-white/90'
                   }`}>
                     {track.name || 'Unknown Track'}
@@ -91,9 +91,9 @@ export default function TrackQueue({
                   </p>
                 </div>
 
-                {/* Duration */}
+                {/* Duration - Hidden on very small screens */}
                 {track.duration && (
-                  <span className="text-xs text-white/50">
+                  <span className="text-xs text-white/50 hidden xs:block flex-shrink-0">
                     {formatDuration(track.duration)}
                   </span>
                 )}
@@ -104,7 +104,7 @@ export default function TrackQueue({
       </ul>
 
       {hasMoreTracks && (
-        <p className="text-white/50 text-xs mt-3 text-center">
+        <p className="text-white/50 text-xs mt-2 sm:mt-3 text-center">
           +{queuedTracks.length - maxVisible} more tracks
         </p>
       )}

@@ -160,8 +160,8 @@ export default function MyShelfPage() {
         onClose={handleMenuClose}
       />
 
-      {/* Main Content Area */}
-      <main className="pt-16 pb-24">
+      {/* Main Content Area - Responsive padding */}
+      <main className="pt-14 sm:pt-16 pb-20 sm:pb-24 safe-area-bottom">
         {/* Loading State */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-16">
@@ -226,13 +226,13 @@ export default function MyShelfPage() {
           </>
         )}
 
-        {/* Add New Vinyl Button - Requirements: 2.6, 9.6 */}
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-10">
+        {/* Add New Vinyl Button - Requirements: 2.6, 9.6, touch-friendly */}
+        <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-10 safe-area-bottom">
           <button
             onClick={handleAddNewVinyl}
-            className="flex items-center gap-2 px-6 py-3 bg-teal-primary text-white font-semibold rounded-full shadow-lg hover:bg-teal-primary/90 transition-colors"
+            className="flex items-center gap-2 px-5 sm:px-6 py-3 sm:py-3.5 bg-teal-primary text-white font-semibold rounded-full shadow-lg hover:bg-teal-primary/90 active:bg-teal-primary/80 active:scale-95 transition-all touch-target text-sm sm:text-base"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Add New Vinyl

@@ -12,6 +12,12 @@
   --pink-medium: #E8C5D0;
   --teal-primary: #00BCD4;
   --cream: #FFF8F0;
+  
+  /* Responsive Sizing Variables */
+  --vinyl-size-mobile: 256px;
+  --vinyl-size-tablet: 320px;
+  --vinyl-size-desktop: 384px;
+  --touch-target-min: 44px;
 }
 
 @theme inline {
@@ -41,6 +47,8 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
 }
 
 /* Custom Animations */
@@ -69,4 +77,54 @@ body {
 
 .animate-spin-vinyl {
   animation: spin-vinyl 1.818s linear infinite;
+}
+
+/* Touch-friendly button sizing */
+.touch-target {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+}
+
+/* Responsive vinyl sizing */
+.vinyl-responsive {
+  width: var(--vinyl-size-mobile);
+  height: var(--vinyl-size-mobile);
+}
+
+@media (min-width: 768px) {
+  .vinyl-responsive {
+    width: var(--vinyl-size-tablet);
+    height: var(--vinyl-size-tablet);
+  }
+}
+
+@media (min-width: 1024px) {
+  .vinyl-responsive {
+    width: var(--vinyl-size-desktop);
+    height: var(--vinyl-size-desktop);
+  }
+}
+
+/* Safe area insets for mobile devices with notches */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Prevent text selection during touch interactions */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Smooth scrolling for mobile */
+.scroll-smooth {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }

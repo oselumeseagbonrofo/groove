@@ -229,6 +229,251 @@ async function fetchAppleMusicPlaylists(musicUserToken, limit, offset) {
 }
 
 /**
+ * POST /api/playlists
+ * Create a new playlist via Spotify/Apple Music API and store vinyl design metadata
+ * Requirements: 4.6, 4.7
+ */
+router.post('/', async (req, res) => {
+  const { userId, name, description, color, customImageUrl } = req.body;
+
+  try {
+    // Validate required fields
+    if (!userId) {
+      return res.status(400).json({
+        error: {
+          message: 'User ID is required',
+          code: 'MISSING_USER_ID',
+          retryable: false
+        }
+      });
+    }
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({
+        error: {
+          message: 'Playlist name is required',
+          code: 'MISSING_PLAYLIST_NAME',
+          retryable: false
+        }
+      });
+    }
+
+    // Get user and their provider
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('id, provider')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !user) {
+      return res.status(404).json({
+        error: {
+          message: 'User not found',
+          code: 'USER_NOT_FOUND',
+          retryable: false
+        }
+      });
+    }
+
+    // Get access token
+    const { data: tokenData, error: tokenError } = await supabase
+      .from('auth_tokens')
+      .select('access_token, expires_at')
+      .eq('user_id', userId)
+      .single();
+
+    if (tokenError || !tokenData) {
+      return res.status(401).json({
+        error: {
+          message: 'No valid authentication token found',
+          code: 'NO_TOKEN',
+          retryable: false
+        }
+      });
+    }
+
+    // Check if token is expired
+    if (new Date(tokenData.expires_at) < new Date()) {
+      return res.status(401).json({
+        error: {
+          message: 'Authentication token expired',
+          code: 'TOKEN_EXPIRED',
+          retryable: false
+        }
+      });
+    }
+
+    let playlist;
+
+    if (user.provider === 'spotify') {
+      playlist = await createSpotifyPlaylist(
+        tokenData.access_token,
+        name.trim(),
+        description?.trim() || ''
+      );
+    } else if (user.provider === 'apple') {
+      playlist = await createAppleMusicPlaylist(
+        tokenData.access_token,
+        name.trim(),
+        description?.trim() || ''
+      );
+    } else {
+      return res.status(400).json({
+        error: {
+          message: 'Unknown music provider',
+          code: 'UNKNOWN_PROVIDER',
+          retryable: false
+        }
+      });
+    }
+
+    // Store vinyl design metadata in Supabase
+    if (color || customImageUrl) {
+      const { error: designError } = await supabase
+        .from('vinyl_designs')
+        .upsert({
+          user_id: userId,
+          playlist_id: playlist.id,
+          color: color || null,
+          custom_image_url: customImageUrl || null,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,playlist_id'
+        });
+
+      if (designError) {
+        console.error('Failed to save vinyl design:', designError);
+        // Don't fail the request, just log the error
+      }
+    }
+
+    res.status(201).json({
+      playlist: {
+        ...playlist,
+        vinylColor: color || null,
+        customImageUrl: customImageUrl || null
+      },
+      message: 'Playlist created successfully'
+    });
+
+  } catch (error) {
+    console.error('Create playlist error:', error);
+    
+    // Log error to Supabase
+    await logError(req.body.userId, 'PLAYLIST_CREATE_ERROR', error.message, req.path);
+    
+    res.status(500).json({
+      error: {
+        message: error.message || 'Failed to create playlist',
+        code: 'PLAYLIST_CREATE_ERROR',
+        retryable: true
+      }
+    });
+  }
+});
+
+/**
+ * Create playlist via Spotify API
+ */
+async function createSpotifyPlaylist(accessToken, name, description) {
+  // First, get the current user's ID
+  const userResponse = await fetch(`${SPOTIFY_API_BASE}/me`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  });
+
+  if (!userResponse.ok) {
+    const errorData = await userResponse.json();
+    throw new Error(`Spotify API error: ${errorData.error?.message || 'Failed to get user'}`);
+  }
+
+  const userData = await userResponse.json();
+  const spotifyUserId = userData.id;
+
+  // Create the playlist
+  const response = await fetch(
+    `${SPOTIFY_API_BASE}/users/${spotifyUserId}/playlists`,
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name,
+        description,
+        public: false // Create as private by default
+      })
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(`Spotify API error: ${errorData.error?.message || 'Failed to create playlist'}`);
+  }
+
+  const data = await response.json();
+
+  return {
+    id: data.id,
+    name: data.name,
+    description: data.description || '',
+    coverImage: data.images?.[0]?.url || null,
+    trackCount: 0,
+    owner: data.owner?.display_name || 'You',
+    isPublic: data.public,
+    provider: 'spotify'
+  };
+}
+
+/**
+ * Create playlist via Apple Music API
+ */
+async function createAppleMusicPlaylist(musicUserToken, name, description) {
+  const response = await fetch(
+    'https://api.music.apple.com/v1/me/library/playlists',
+    {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.APPLE_MUSIC_DEVELOPER_TOKEN}`,
+        'Music-User-Token': musicUserToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        attributes: {
+          name,
+          description
+        }
+      })
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(`Apple Music API error: ${errorData.errors?.[0]?.detail || 'Failed to create playlist'}`);
+  }
+
+  const data = await response.json();
+  const playlist = data.data?.[0];
+
+  if (!playlist) {
+    throw new Error('No playlist returned from Apple Music API');
+  }
+
+  return {
+    id: playlist.id,
+    name: playlist.attributes?.name || name,
+    description: playlist.attributes?.description?.standard || description,
+    coverImage: playlist.attributes?.artwork?.url?.replace('{w}x{h}', '300x300') || null,
+    trackCount: 0,
+    owner: 'You',
+    isPublic: false,
+    provider: 'apple'
+  };
+}
+
+/**
  * Log error to Supabase error_logs table
  */
 async function logError(userId, errorType, errorMessage, requestPath) {

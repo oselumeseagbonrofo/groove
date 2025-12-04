@@ -137,47 +137,54 @@ export default function NowPlayingPage() {
         onClose={handleMenuClose}
       />
 
-      {/* Main Content Area */}
-      <main className="pt-16 px-4 pb-8">
-        {/* Vinyl Turntable */}
-        <div className="flex justify-center py-4">
-          <VinylTurntable
-            playlist={playlist}
-            currentTrack={currentTrack}
-            isPlaying={isPlaying}
-            progress={progress}
-            onSeek={handleSeek}
-          />
-        </div>
+      {/* Main Content Area - Responsive layout: stacked on mobile, side-by-side on desktop */}
+      <main className="pt-14 sm:pt-16 px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 safe-area-bottom max-w-7xl mx-auto">
+        {/* Desktop: Two-column layout */}
+        <div className="lg:flex lg:gap-8 lg:items-start lg:pt-4">
+          {/* Left Column: Turntable and Controls */}
+          <div className="lg:flex-1 lg:max-w-xl">
+            {/* Vinyl Turntable - Centered with responsive sizing */}
+            <div className="flex justify-center py-2 sm:py-4">
+              <VinylTurntable
+                playlist={playlist}
+                currentTrack={currentTrack}
+                isPlaying={isPlaying}
+                progress={progress}
+                onSeek={handleSeek}
+              />
+            </div>
 
-        {/* Track Info */}
-        <TrackInfo
-          track={currentTrack}
-          progress={progress}
-          currentTime={currentTime}
-          duration={duration}
-        />
+            {/* Track Info */}
+            <TrackInfo
+              track={currentTrack}
+              progress={progress}
+              currentTime={currentTime}
+              duration={duration}
+            />
 
-        {/* Playback Controls */}
-        <div className="py-4">
-          <PlaybackControls
-            isPlaying={isPlaying}
-            currentTime={currentTime / 1000} // Convert to seconds for 3-second threshold
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onSkipForward={handleSkipForward}
-            onSkipBackward={handleSkipBackward}
-          />
-        </div>
+            {/* Playback Controls - Touch-friendly spacing */}
+            <div className="py-3 sm:py-4">
+              <PlaybackControls
+                isPlaying={isPlaying}
+                currentTime={currentTime / 1000} // Convert to seconds for 3-second threshold
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onSkipForward={handleSkipForward}
+                onSkipBackward={handleSkipBackward}
+              />
+            </div>
+          </div>
 
-        {/* Track Queue */}
-        <div className="mt-4">
-          <TrackQueue
-            tracks={playlist.tracks}
-            currentIndex={currentTrackIndex}
-            onTrackSelect={handleTrackSelect}
-            onViewAll={handleViewAll}
-          />
+          {/* Right Column: Track Queue (visible on desktop) */}
+          <div className="mt-3 sm:mt-4 lg:mt-0 lg:w-80 xl:w-96 lg:sticky lg:top-20">
+            <TrackQueue
+              tracks={playlist.tracks}
+              currentIndex={currentTrackIndex}
+              onTrackSelect={handleTrackSelect}
+              onViewAll={handleViewAll}
+              maxVisible={8}
+            />
+          </div>
         </div>
       </main>
     </div>

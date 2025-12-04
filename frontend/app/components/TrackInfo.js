@@ -24,27 +24,27 @@ export default function TrackInfo({
 }) {
   if (!track) {
     return (
-      <div className="text-center py-4">
-        <p className="text-white/60 text-sm">No track playing</p>
+      <div className="text-center py-3 sm:py-4">
+        <p className="text-white/60 text-xs sm:text-sm">No track playing</p>
       </div>
     );
   }
 
   return (
-    <div className="text-center py-4">
-      {/* Track Name */}
-      <h2 className="text-white text-lg md:text-xl font-semibold truncate px-4">
+    <div className="text-center py-3 sm:py-4">
+      {/* Track Name - Responsive text sizing */}
+      <h2 className="text-white text-base sm:text-lg md:text-xl font-semibold truncate px-3 sm:px-4">
         {track.name || 'Unknown Track'}
       </h2>
       
       {/* Artist Name */}
-      <p className="text-white/70 text-sm md:text-base mt-1 truncate px-4">
+      <p className="text-white/70 text-xs sm:text-sm md:text-base mt-0.5 sm:mt-1 truncate px-3 sm:px-4">
         {track.artist || 'Unknown Artist'}
       </p>
 
-      {/* Progress Bar */}
-      <div className="mt-4 px-4">
-        <div className="relative h-1 bg-white/20 rounded-full overflow-hidden">
+      {/* Progress Bar - Touch-friendly height */}
+      <div className="mt-3 sm:mt-4 px-3 sm:px-4">
+        <div className="relative h-1.5 sm:h-1 bg-white/20 rounded-full overflow-hidden">
           <div 
             className="absolute left-0 top-0 h-full bg-teal-primary rounded-full transition-all duration-300"
             style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
@@ -52,7 +52,7 @@ export default function TrackInfo({
         </div>
         
         {/* Time Display */}
-        <div className="flex justify-between mt-2 text-xs text-white/50">
+        <div className="flex justify-between mt-1.5 sm:mt-2 text-xs text-white/50">
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import playlistRoutes from './routes/playlists.js';
 import playbackRoutes from './routes/playback.js';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 
@@ -27,17 +28,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/playback', playbackRoutes);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.statusCode || 500).json({
-    error: {
-      message: err.message || 'Internal server error',
-      code: err.code,
-      retryable: err.retryable || false
-    }
-  });
-});
+// 404 handler for undefined routes
+app.use(notFoundHandler);
+
+// Error handling middleware - logs to Supabase and returns appropriate responses
+// Requirements: 7.3
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Groove backend server running on port ${PORT}`);

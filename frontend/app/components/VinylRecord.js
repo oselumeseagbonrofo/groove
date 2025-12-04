@@ -36,7 +36,7 @@ export default function VinylRecord({
   return (
     <button
       onClick={() => onClick(playlist)}
-      className="group relative w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36 cursor-pointer transition-transform duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-primary focus:ring-offset-2 rounded-full"
+      className="group relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-36 lg:h-36 cursor-pointer transition-transform duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-teal-primary focus:ring-offset-2 rounded-full touch-target"
       aria-label={`Play ${playlist?.name || 'playlist'}`}
     >
       {/* Vinyl Record Outer Ring */}
@@ -56,7 +56,7 @@ export default function VinylRecord({
         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
         
         {/* Center Label */}
-        <div className="absolute inset-0 m-auto w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full overflow-hidden shadow-inner">
+        <div className="absolute inset-0 m-auto w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full overflow-hidden shadow-inner">
           {hasValidCover ? (
             <img 
               src={labelImage} 
@@ -66,7 +66,7 @@ export default function VinylRecord({
           ) : (
             /* Default Groove Logo Design - Requirements: 2.3 */
             <div className="w-full h-full bg-gradient-to-br from-purple-medium to-lavender flex items-center justify-center">
-              <span className="text-white text-lg sm:text-xl md:text-2xl font-bold">G</span>
+              <span className="text-white text-base sm:text-lg md:text-xl lg:text-2xl font-bold">G</span>
             </div>
           )}
         </div>

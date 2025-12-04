@@ -108,9 +108,9 @@ export default function VinylTurntable({
   const coverImage = playlist?.coverImage || currentTrack?.albumArt || null;
 
   return (
-    <div className="flex flex-col items-center">
-      {/* Turntable Base */}
-      <div className="relative w-72 h-72 md:w-80 md:h-80 lg:w-96 lg:h-96">
+    <div className="flex flex-col items-center w-full">
+      {/* Turntable Base - Responsive sizing for mobile/tablet/desktop */}
+      <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96">
         {/* Turntable Platform */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg shadow-2xl" />
         
@@ -149,7 +149,7 @@ export default function VinylTurntable({
           />
           
           {/* Center Label - Shows playlist cover or default Groove logo */}
-          <div className="absolute inset-0 m-auto w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full overflow-hidden shadow-inner">
+          <div className="absolute inset-0 m-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full overflow-hidden shadow-inner">
             {coverImage ? (
               <img 
                 src={coverImage} 
