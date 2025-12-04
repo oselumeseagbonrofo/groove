@@ -10,3 +10,8 @@ export { default as NavigationMenu } from './NavigationMenu';
 export { default as VinylRecord } from './VinylRecord';
 export { default as VinylShelf } from './VinylShelf';
 export { default as VinylTurntable } from './VinylTurntable';
+
+// Playback Components
+export { default as PlaybackControls } from './PlaybackControls';
+export { default as TrackQueue } from './TrackQueue';
+export { default as TrackInfo } from './TrackInfo';

@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import playlistRoutes from './routes/playlists.js';
+import playbackRoutes from './routes/playback.js';
 
 dotenv.config();
 
@@ -24,7 +25,7 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/playlists', playlistRoutes);
-// app.use('/api/playback', playbackRoutes);
+app.use('/api/playback', playbackRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

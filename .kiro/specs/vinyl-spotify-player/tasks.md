@@ -113,7 +113,7 @@
     - Display playlist cover as vinyl label
     - Implement 33 RPM spinning animation (1.818s per rotation)
     - _Requirements: 3.1, 5.4, 9.5_
-  - [ ]* 7.2 Write property test for vinyl label display
+  - [x] 7.2 Write property test for vinyl label display
     - **Property 4: Vinyl Label Display**
     - **Validates: Requirements 3.1**
   - [x] 7.3 Implement seek/scrub functionality
@@ -121,56 +121,56 @@
     - Calculate seek position from drag percentage
     - Call playback API with seek time
     - _Requirements: 3.4_
-  - [ ]* 7.4 Write property test for seek position mapping
+  - [x] 7.4 Write property test for seek position mapping
     - **Property 5: Seek Position Mapping**
     - **Validates: Requirements 3.4**
-  - [-] 7.5 Create PlaybackControls component
+  - [x] 7.5 Create PlaybackControls component
     - Implement play/pause button with state toggle
     - Implement skip forward button
     - Implement skip backward button with 3-second threshold logic
     - _Requirements: 3.2, 3.3, 3.5, 3.6_
-  - [ ]* 7.6 Write property test for skip forward
+  - [x] 7.6 Write property test for skip forward
     - **Property 6: Skip Forward Track Advancement**
     - **Validates: Requirements 3.5**
-  - [ ]* 7.7 Write property test for skip backward behavior
+  - [x] 7.7 Write property test for skip backward behavior
     - **Property 7: Skip Backward Behavior**
     - **Validates: Requirements 3.6**
-  - [ ] 7.8 Create TrackQueue component
+  - [x] 7.8 Create TrackQueue component
     - Display list of tracks with names and artists
     - Highlight current track
     - Add "View All" button for full playlist view
     - _Requirements: 3.7, 3.8_
-  - [ ]* 7.9 Write property test for track queue completeness
+  - [x] 7.9 Write property test for track queue completeness
     - **Property 8: Track Queue Completeness**
     - **Validates: Requirements 3.7**
-  - [ ] 7.10 Create TrackInfo component
+  - [x] 7.10 Create TrackInfo component
     - Display current track name and artist
     - Show progress indicator
     - _Requirements: 5.1, 5.2_
-  - [ ]* 7.11 Write property test for track info display
+  - [x] 7.11 Write property test for track info display
     - **Property 12: Track Info Display**
     - **Validates: Requirements 5.1**
-  - [ ] 7.12 Create NowPlayingScreen page
+  - [x] 7.12 Create NowPlayingScreen page
     - Integrate all playback components
     - Apply pink/lavender gradient background
     - Connect to playback state management
     - _Requirements: 3.1, 9.2_
 
-- [ ] 8. Playback API Integration
-  - [ ] 8.1 Implement playback service endpoints
+- [x] 8. Playback API Integration
+  - [x] 8.1 Implement playback service endpoints
     - Create POST /api/playback/play endpoint
     - Create POST /api/playback/pause endpoint
     - Create POST /api/playback/seek endpoint
     - Create POST /api/playback/skip endpoint
     - Create GET /api/playback/state endpoint
     - _Requirements: 3.2, 3.3, 3.4, 3.5, 3.6_
-  - [ ] 8.2 Create usePlayback hook
+  - [x] 8.2 Create usePlayback hook
     - Manage playback state (isPlaying, currentTrack, progress)
     - Handle real-time progress updates
     - Sync with Spotify/Apple Music playback state
     - _Requirements: 5.3_
 
-- [ ] 9. Checkpoint - Ensure all tests pass
+- [-] 9. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 10. Create New Screen - Vinyl Customization

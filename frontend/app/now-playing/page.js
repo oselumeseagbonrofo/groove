@@ -1,7 +1,14 @@
 'use client';
 
-import { useState } from 'react';
-import { Header, NavigationMenu } from '../components';
+import { useState, useCallback } from 'react';
+import { 
+  Header, 
+  NavigationMenu, 
+  VinylTurntable, 
+  PlaybackControls, 
+  TrackQueue, 
+  TrackInfo 
+} from '../components';
 
 /**
  * Now Playing Page - Main playback interface with vinyl turntable
@@ -9,6 +16,30 @@ import { Header, NavigationMenu } from '../components';
  */
 export default function NowPlayingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Playback state - will be connected to usePlayback hook in Task 8
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+
+  // Mock playlist data - will be replaced with real data from API
+  const [playlist] = useState({
+    id: 'demo-playlist',
+    name: 'Demo Playlist',
+    coverImage: null,
+    tracks: [
+      { id: '1', name: 'Track One', artist: 'Artist A', duration: 210000 },
+      { id: '2', name: 'Track Two', artist: 'Artist B', duration: 185000 },
+      { id: '3', name: 'Track Three', artist: 'Artist C', duration: 240000 },
+      { id: '4', name: 'Track Four', artist: 'Artist D', duration: 195000 },
+      { id: '5', name: 'Track Five', artist: 'Artist E', duration: 220000 },
+      { id: '6', name: 'Track Six', artist: 'Artist F', duration: 175000 },
+    ]
+  });
+
+  const currentTrack = playlist.tracks[currentTrackIndex] || null;
+  const duration = currentTrack?.duration || 0;
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -19,9 +50,75 @@ export default function NowPlayingPage() {
   };
 
   const handleNavigate = (screen) => {
-    // Navigation is handled by Link components in NavigationMenu
     console.log('Navigating to:', screen);
   };
+
+  const handlePlay = useCallback(() => {
+    setIsPlaying(true);
+  }, []);
+
+  const handlePause = useCallback(() => {
+    setIsPlaying(false);
+  }, []);
+
+  /**
+   * Property 6: Skip Forward Track Advancement
+   * For any playlist with multiple tracks, tapping skip forward SHALL
+   * increment the current track index by 1, wrapping to 0 when at the last track.
+   */
+  const handleSkipForward = useCallback(() => {
+    setCurrentTrackIndex((prev) => {
+      const nextIndex = prev + 1;
+      return nextIndex >= playlist.tracks.length ? 0 : nextIndex;
+    });
+    setProgress(0);
+    setCurrentTime(0);
+  }, [playlist.tracks.length]);
+
+  /**
+   * Property 7: Skip Backward Behavior
+   * For any playback state, tapping skip backward SHALL:
+   * (a) restart the current track if elapsed time > 3 seconds, or
+   * (b) go to the previous track if elapsed time <= 3 seconds
+   */
+  const handleSkipBackward = useCallback((shouldRestart) => {
+    if (shouldRestart) {
+      // Restart current track
+      setProgress(0);
+      setCurrentTime(0);
+    } else {
+      // Go to previous track
+      setCurrentTrackIndex((prev) => {
+        const prevIndex = prev - 1;
+        return prevIndex < 0 ? playlist.tracks.length - 1 : prevIndex;
+      });
+      setProgress(0);
+      setCurrentTime(0);
+    }
+  }, [playlist.tracks.length]);
+
+  /**
+   * Property 5: Seek Position Mapping
+   * For any drag/scrub position on the vinyl record (0-100%),
+   * the seek position SHALL map proportionally to the current track's duration.
+   */
+  const handleSeek = useCallback((seekPercentage) => {
+    setProgress(seekPercentage);
+    const seekTime = Math.floor((seekPercentage / 100) * duration);
+    setCurrentTime(seekTime);
+    // Will call playback API in Task 8
+  }, [duration]);
+
+  const handleTrackSelect = useCallback((index) => {
+    setCurrentTrackIndex(index);
+    setProgress(0);
+    setCurrentTime(0);
+  }, []);
+
+  const handleViewAll = useCallback(() => {
+    // Will navigate to full playlist view
+    console.log('View all tracks');
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-dark via-pink-medium to-lavender">
@@ -42,44 +139,45 @@ export default function NowPlayingPage() {
 
       {/* Main Content Area */}
       <main className="pt-16 px-4 pb-8">
-        {/* Placeholder for VinylTurntable component (Task 7) */}
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <div className="w-64 h-64 rounded-full bg-black shadow-2xl relative">
-            {/* Grooves */}
-            <div className="absolute inset-2 rounded-full border border-gray-800" />
-            <div className="absolute inset-4 rounded-full border border-gray-800" />
-            <div className="absolute inset-6 rounded-full border border-gray-800" />
-            <div className="absolute inset-8 rounded-full border border-gray-800" />
-            <div className="absolute inset-10 rounded-full border border-gray-800" />
-            
-            {/* Center Label */}
-            <div className="absolute inset-0 m-auto w-20 h-20 rounded-full bg-gradient-to-br from-purple-medium to-lavender flex items-center justify-center">
-              <span className="text-white text-lg font-bold">G</span>
-            </div>
-          </div>
-          
-          <p className="mt-8 text-white/60 text-sm">
-            Select a playlist from My Shelf to start playing
-          </p>
+        {/* Vinyl Turntable */}
+        <div className="flex justify-center py-4">
+          <VinylTurntable
+            playlist={playlist}
+            currentTrack={currentTrack}
+            isPlaying={isPlaying}
+            progress={progress}
+            onSeek={handleSeek}
+          />
         </div>
 
-        {/* Placeholder for PlaybackControls (Task 7) */}
-        <div className="flex justify-center gap-8 mt-8">
-          <button className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-            <span className="text-white">⏮</span>
-          </button>
-          <button className="w-16 h-16 rounded-full bg-teal-primary flex items-center justify-center">
-            <span className="text-white text-2xl">▶</span>
-          </button>
-          <button className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-            <span className="text-white">⏭</span>
-          </button>
+        {/* Track Info */}
+        <TrackInfo
+          track={currentTrack}
+          progress={progress}
+          currentTime={currentTime}
+          duration={duration}
+        />
+
+        {/* Playback Controls */}
+        <div className="py-4">
+          <PlaybackControls
+            isPlaying={isPlaying}
+            currentTime={currentTime / 1000} // Convert to seconds for 3-second threshold
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onSkipForward={handleSkipForward}
+            onSkipBackward={handleSkipBackward}
+          />
         </div>
 
-        {/* Placeholder for TrackQueue (Task 7) */}
-        <div className="mt-8 bg-white/10 rounded-lg p-4">
-          <h3 className="text-white font-semibold mb-2">Up Next</h3>
-          <p className="text-white/60 text-sm">No tracks in queue</p>
+        {/* Track Queue */}
+        <div className="mt-4">
+          <TrackQueue
+            tracks={playlist.tracks}
+            currentIndex={currentTrackIndex}
+            onTrackSelect={handleTrackSelect}
+            onViewAll={handleViewAll}
+          />
         </div>
       </main>
     </div>
