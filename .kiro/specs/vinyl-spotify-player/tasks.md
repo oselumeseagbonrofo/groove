@@ -59,28 +59,28 @@
     - Handle loading and error states
     - _Requirements: 1.3, 1.4_
 
-- [ ] 4. Navigation and Layout System
-  - [ ] 4.1 Create Header component
+- [x] 4. Navigation and Layout System
+  - [x] 4.1 Create Header component
     - Implement hamburger menu icon
     - Display dynamic screen title (NOW PLAYING, MY SHELF, CREATE NEW)
     - Apply dark header styling for Now Playing screen
     - _Requirements: 6.1, 6.4, 6.5, 6.6_
-  - [ ] 4.2 Create NavigationMenu component
+  - [x] 4.2 Create NavigationMenu component
     - Implement slide-out menu with navigation options
     - Add smooth transition animations
     - Handle menu open/close state
     - _Requirements: 6.2, 6.3_
-  - [ ] 4.3 Set up App Router page structure
+  - [x] 4.3 Set up App Router page structure
     - Create /welcome route
     - Create /now-playing route
     - Create /my-shelf route
     - Create /create-new route
     - _Requirements: 10.1_
 
-- [ ] 5. Checkpoint - Ensure all tests pass
+- [x] 5. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. My Shelf Screen - Playlist Collection
+- [-] 6. My Shelf Screen - Playlist Collection
   - [ ] 6.1 Create playlist API endpoints
     - Implement GET /api/playlists to fetch user playlists
     - Handle pagination for large playlist collections
@@ -89,7 +89,7 @@
     - Render vinyl with black outer ring and grooves texture
     - Display playlist cover as center label
     - Implement default Groove logo for missing covers
-    - _Requirements: 2.2, 2.3, 9.5_
+    - _Requirements: 2.2, 2.3
   - [ ]* 6.3 Write property test for playlist rendering
     - **Property 2: Playlist Rendering Consistency**
     - **Validates: Requirements 2.2**
@@ -107,7 +107,7 @@
     - Implement infinite scroll for additional playlists
     - _Requirements: 2.1, 2.6, 9.6_
 
-- [ ] 7. Now Playing Screen - Playback Interface
+- [-] 7. Now Playing Screen - Playback Interface
   - [ ] 7.1 Create VinylTurntable component
     - Render vinyl record on turntable base
     - Display playlist cover as vinyl label
