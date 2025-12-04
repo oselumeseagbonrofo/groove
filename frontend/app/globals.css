@@ -3,6 +3,15 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Groove Custom Colors */
+  --purple-dark: #2D1B4E;
+  --purple-medium: #4A2C6D;
+  --lavender: #B8A4D4;
+  --pink-light: #F5E6E8;
+  --pink-medium: #E8C5D0;
+  --teal-primary: #00BCD4;
+  --cream: #FFF8F0;
 }
 
 @theme inline {
@@ -10,6 +19,15 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Groove Custom Theme Colors */
+  --color-purple-dark: var(--purple-dark);
+  --color-purple-medium: var(--purple-medium);
+  --color-lavender: var(--lavender);
+  --color-pink-light: var(--pink-light);
+  --color-pink-medium: var(--pink-medium);
+  --color-teal-primary: var(--teal-primary);
+  --color-cream: var(--cream);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +41,32 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Custom Animations */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Vinyl 33 RPM animation (1.818s per rotation) */
+@keyframes spin-vinyl {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-vinyl {
+  animation: spin-vinyl 1.818s linear infinite;
 }

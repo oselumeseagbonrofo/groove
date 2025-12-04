@@ -1,60 +1,60 @@
 # Implementation Plan
 
 - [ ] 1. Project Setup and Configuration
-  - [ ] 1.1 Set up backend Express.js project structure
+  - [x] 1.1 Set up backend Express.js project structure
     - Create backend directory with Express.js boilerplate (JavaScript)
     - Configure ESLint and Prettier for JavaScript
     - Set up Supabase client configuration
     - Add environment variables template (.env.example)
     - _Requirements: 10.1, 10.4_
-  - [ ] 1.2 Configure frontend Next.js project
+  - [x] 1.2 Configure frontend Next.js project
     - Update existing Next.js project with App Router structure (JavaScript)
     - Configure Tailwind CSS with custom color palette from design (purple gradients, teal buttons)
     - Set up fast-check for property-based testing
     - Add Jest and React Testing Library configuration
     - _Requirements: 10.1, 10.2_
-  - [ ] 1.3 Set up Supabase database schema
+  - [x] 1.3 Set up Supabase database schema
     - Create users, auth_tokens, vinyl_designs, and error_logs tables
     - Configure Row Level Security (RLS) policies
     - Set up Supabase Storage bucket for custom images
     - _Requirements: 10.4_
 
-- [ ] 2. Authentication System
-  - [ ] 2.1 Implement Spotify OAuth flow
+- [x] 2. Authentication System
+  - [x] 2.1 Implement Spotify OAuth flow
     - Create /api/auth/spotify endpoint for OAuth initiation
     - Create /api/auth/callback endpoint for handling Spotify callback
     - Store tokens securely in Supabase auth_tokens table
     - _Requirements: 1.3, 1.5_
-  - [ ] 2.2 Implement Apple Music OAuth flow
+  - [x] 2.2 Implement Apple Music OAuth flow
     - Create /api/auth/apple endpoint for OAuth initiation
     - Handle Apple Music authorization callback
     - Store tokens in Supabase
     - _Requirements: 1.4, 1.5_
-  - [ ] 2.3 Implement token refresh mechanism
+  - [x] 2.3 Implement token refresh mechanism
     - Create /api/auth/refresh endpoint
     - Implement automatic token refresh before expiration
     - Update stored tokens in Supabase
     - _Requirements: 1.6_
-  - [ ]* 2.4 Write property test for token refresh
+  - [x] 2.4 Write property test for token refresh
     - **Property 1: Token Refresh Preserves Authentication**
     - **Validates: Requirements 1.6**
-  - [ ] 2.5 Implement logout functionality
+  - [x] 2.5 Implement logout functionality
     - Create /api/auth/logout endpoint
     - Clear tokens from Supabase and client state
     - _Requirements: 1.7_
 
-- [ ] 3. Welcome and Splash Screen
-  - [ ] 3.1 Create SplashScreen component
+- [x] 3. Welcome and Splash Screen
+  - [x] 3.1 Create SplashScreen component
     - Implement animated Groove vinyl logo
     - Add purple-to-pink gradient background
     - Trigger transition callback after animation completes
     - _Requirements: 1.1, 9.1_
-  - [ ] 3.2 Create WelcomeScreen component
+  - [x] 3.2 Create WelcomeScreen component
     - Display "Connect with Spotify" button
     - Display "Connect with Apple Music" button
     - Apply gradient background styling
     - _Requirements: 1.2, 9.1_
-  - [ ] 3.3 Implement authentication button handlers
+  - [x] 3.3 Implement authentication button handlers
     - Connect buttons to OAuth endpoints
     - Handle loading and error states
     - _Requirements: 1.3, 1.4_
