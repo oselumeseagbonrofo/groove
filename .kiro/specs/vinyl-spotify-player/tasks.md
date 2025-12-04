@@ -80,12 +80,12 @@
 - [x] 5. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [-] 6. My Shelf Screen - Playlist Collection
-  - [ ] 6.1 Create playlist API endpoints
+- [x] 6. My Shelf Screen - Playlist Collection
+  - [x] 6.1 Create playlist API endpoints
     - Implement GET /api/playlists to fetch user playlists
     - Handle pagination for large playlist collections
     - _Requirements: 2.1, 2.4_
-  - [ ] 6.2 Create VinylRecord component
+  - [x] 6.2 Create VinylRecord component
     - Render vinyl with black outer ring and grooves texture
     - Display playlist cover as center label
     - Implement default Groove logo for missing covers
@@ -93,22 +93,22 @@
   - [ ]* 6.3 Write property test for playlist rendering
     - **Property 2: Playlist Rendering Consistency**
     - **Validates: Requirements 2.2**
-  - [ ]* 6.4 Write property test for default cover fallback
+  - [x] 6.4 Write property test for default cover fallback
     - **Property 3: Default Cover Fallback**
     - **Validates: Requirements 2.3**
-  - [ ] 6.5 Create VinylShelf component
+  - [x] 6.5 Create VinylShelf component
     - Arrange vinyl records on wooden shelf rows
     - Apply light pink/cream background with wood textures
     - Handle click navigation to Now Playing
     - _Requirements: 2.2, 2.5, 9.3_
-  - [ ] 6.6 Create MyShelfScreen page
+  - [x] 6.6 Create MyShelfScreen page
     - Integrate VinylShelf with playlist data
     - Add "Add New Vinyl" button with teal styling
     - Implement infinite scroll for additional playlists
     - _Requirements: 2.1, 2.6, 9.6_
 
 - [-] 7. Now Playing Screen - Playback Interface
-  - [ ] 7.1 Create VinylTurntable component
+  - [x] 7.1 Create VinylTurntable component
     - Render vinyl record on turntable base
     - Display playlist cover as vinyl label
     - Implement 33 RPM spinning animation (1.818s per rotation)
@@ -116,7 +116,7 @@
   - [ ]* 7.2 Write property test for vinyl label display
     - **Property 4: Vinyl Label Display**
     - **Validates: Requirements 3.1**
-  - [ ] 7.3 Implement seek/scrub functionality
+  - [x] 7.3 Implement seek/scrub functionality
     - Handle drag interactions on vinyl record
     - Calculate seek position from drag percentage
     - Call playback API with seek time
@@ -124,7 +124,7 @@
   - [ ]* 7.4 Write property test for seek position mapping
     - **Property 5: Seek Position Mapping**
     - **Validates: Requirements 3.4**
-  - [ ] 7.5 Create PlaybackControls component
+  - [-] 7.5 Create PlaybackControls component
     - Implement play/pause button with state toggle
     - Implement skip forward button
     - Implement skip backward button with 3-second threshold logic

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import Image from 'next/image';
+import groove from "@/public/groove.png"
 
 /**
  * WelcomeScreen - Authentication options
@@ -51,19 +53,7 @@ export default function WelcomeScreen({ onSpotifyConnect, onAppleMusicConnect })
       {/* Logo Section */}
       <div className="mb-12">
         {/* Vinyl Record Logo */}
-        <div className="w-32 h-32 rounded-full bg-black shadow-2xl relative mx-auto">
-          {/* Grooves */}
-          <div className="absolute inset-1 rounded-full border border-gray-800" />
-          <div className="absolute inset-2 rounded-full border border-gray-800" />
-          <div className="absolute inset-3 rounded-full border border-gray-800" />
-          <div className="absolute inset-4 rounded-full border border-gray-800" />
-          <div className="absolute inset-5 rounded-full border border-gray-800" />
-          
-          {/* Center Label */}
-          <div className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-gradient-to-br from-purple-medium to-lavender flex items-center justify-center">
-            <span className="text-white text-sm font-bold">G</span>
-          </div>
-        </div>
+        <div><Image src={groove} height={200} width={200} /></div>
         
         <h1 className="text-3xl font-bold text-white tracking-widest mt-6 text-center">GROOVE</h1>
         <p className="text-lavender text-sm mt-2 text-center">Your music, reimagined</p>
