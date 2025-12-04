@@ -60,3 +60,4 @@ npm run db:verify # Verify database setup
 - Semicolons required
 - ES Modules (`import`/`export`)
 - Unix line endings
+- NextJS components

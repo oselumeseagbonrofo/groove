@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from './components';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,13 +17,19 @@ export const metadata = {
   description: "Experience your music collection with a nostalgic vinyl record player interface",
 };
 
+/**
+ * RootLayout - Main application layout with providers
+ * Requirements: 7.2, 7.5
+ */
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

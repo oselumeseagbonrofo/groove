@@ -216,7 +216,7 @@
     - Handle success and error states
     - _Requirements: 4.1, 4.7, 4.8, 9.4_
 
-- [-] 11. Error Handling System
+- [x] 11. Error Handling System
   - [x] 11.1 Implement backend error middleware
     - Create error logging to Supabase error_logs table
     - Return appropriate error responses with retry information
@@ -233,7 +233,7 @@
     - Create useNetworkStatus hook
     - Display offline notification when connectivity lost
     - _Requirements: 7.2_
-  - [-] 11.5 Implement rate limit handling
+  - [x] 11.5 Implement rate limit handling
     - Detect 429 responses from APIs
     - Queue requests and display delay notification
     - _Requirements: 7.5_
@@ -251,7 +251,7 @@
     - Display expanded shelf view with larger vinyls
     - Optimize spacing for larger screens
     - _Requirements: 8.3_
-  - [ ] 12.4 Implement touch gesture support
+  - [-] 12.4 Implement touch gesture support
     - Add swipe gestures for track navigation
     - Ensure tap interactions work correctly
     - _Requirements: 8.5_

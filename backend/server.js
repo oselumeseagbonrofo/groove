@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.js';
 import playlistRoutes from './routes/playlists.js';
 import playbackRoutes from './routes/playback.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { rateLimitMiddleware } from './middleware/rateLimitHandler.js';
 
 dotenv.config();
 
@@ -17,6 +18,10 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+
+// Rate limiting middleware - detects and handles 429 responses
+// Requirements: 7.5
+app.use('/api', rateLimitMiddleware);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
