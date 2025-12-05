@@ -38,9 +38,8 @@ export default function CreateNewPage() {
     setSuccessMessage(null);
 
     try {
-      // Get user ID from localStorage or auth context
-      // In production, this would come from an auth context
-      const userId = localStorage.getItem('groove_user_id');
+      // Get user ID from sessionStorage (set during OAuth callback)
+      const userId = sessionStorage.getItem('userId');
 
       if (!userId) {
         setError('Please log in to create a playlist');
@@ -80,7 +79,7 @@ export default function CreateNewPage() {
 
       // Success! Show message and redirect to My Shelf
       setSuccessMessage(`"${data.playlist.name}" created successfully!`);
-      
+
       // Redirect to My Shelf after a short delay
       setTimeout(() => {
         router.push('/my-shelf');
@@ -97,8 +96,8 @@ export default function CreateNewPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header - Requirements: 6.6 */}
-      <Header 
-        title="CREATE NEW" 
+      <Header
+        title="CREATE NEW"
         onMenuToggle={handleMenuToggle}
         isDark={false}
       />
@@ -118,17 +117,17 @@ export default function CreateNewPage() {
         {successMessage && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-center gap-2">
-              <svg 
-                className="w-5 h-5 text-green-500" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-5 h-5 text-green-500"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M5 13l4 4L19 7" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
                 />
               </svg>
               <p className="text-sm text-green-700 font-medium">{successMessage}</p>
