@@ -141,6 +141,59 @@ frontend/
 - ✅ Teal buttons (#00BCD4)
 - ✅ Light pink/cream backgrounds (#F5E6E8)
 
+## 🌐 Vercel Deployment Environment Variables
+
+When deploying to Vercel, configure the following environment variables in the Vercel Dashboard under **Project Settings > Environment Variables**:
+
+| Variable | Description | Required | Example |
+|----------|-------------|----------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL for database and auth | Yes | `https://your-project.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase public/anon key for client-side access | Yes | `sb_publishable_...` |
+| `NEXT_PUBLIC_API_URL` | Backend API URL (Render deployment) | Yes | `https://groove-api.onrender.com/api` |
+
+### Configuration Steps
+
+1. **Navigate to Vercel Dashboard**: Go to your project settings
+2. **Add Environment Variables**: Under "Environment Variables" section
+3. **Set for Production**: Ensure variables are set for the "Production" environment
+4. **Redeploy**: After adding variables, trigger a new deployment
+
+### Variable Details
+
+#### NEXT_PUBLIC_SUPABASE_URL
+- **Purpose**: Connects the frontend to your Supabase project for database queries and authentication
+- **Source**: Found in Supabase Dashboard > Project Settings > API > Project URL
+- **Format**: `https://<project-ref>.supabase.co`
+
+#### NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+- **Purpose**: Public key for client-side Supabase operations (safe to expose)
+- **Source**: Found in Supabase Dashboard > Project Settings > API > Project API keys > anon/public
+- **Format**: `sb_publishable_...` or `eyJhbGc...` (JWT format)
+
+#### NEXT_PUBLIC_API_URL
+- **Purpose**: Points to the backend Express.js API deployed on Render
+- **Source**: Your Render deployment URL + `/api` suffix
+- **Format**: `https://<your-service>.onrender.com/api`
+- **Note**: Must match the backend URL exactly for CORS to work correctly
+
+### Local Development
+
+For local development, copy `.env.local.example` to `.env.local` and configure:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-supabase-anon-key
+NEXT_PUBLIC_API_URL=http://127.0.0.1:3001/api
+```
+
+### Important Notes
+
+- All `NEXT_PUBLIC_` prefixed variables are exposed to the browser - only use for public/non-sensitive values
+- The `NEXT_PUBLIC_API_URL` must point to the Render backend URL in production
+- Ensure the backend's `FRONTEND_URL` environment variable matches your Vercel deployment URL for CORS
+
+**Validates: Requirements 2.3, 2.4**
+
 ## 🎯 Next Steps
 
 The frontend is now ready for component development. Future tasks can:
