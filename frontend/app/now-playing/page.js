@@ -282,26 +282,12 @@ export default function NowPlayingPage() {
         onClose={handleMenuClose}
       />
 
-      {/* Web Player Status */}
-      {isReady && deviceId && (
-        <div className="pt-14 px-4">
-          <div className="bg-green-500/20 border border-green-500 text-gray-800 px-4 py-2 rounded text-sm">
-            ✓ Web player ready - No Spotify app needed!
-          </div>
-        </div>
-      )}
-
       {/* Error Display */}
       {(playbackError || playlistError) && (
         <div className="pt-14 px-4">
           <div className="bg-red-500/20 border border-red-500 text-white px-4 py-3 rounded">
             <p className="font-semibold">Error</p>
             <p className="text-sm">{playbackError || playlistError}</p>
-            {!isReady && playbackError?.includes('device') && (
-              <p className="text-xs mt-2">
-                Tip: The web player is loading. If this persists, open Spotify on another device.
-              </p>
-            )}
           </div>
         </div>
       )}
@@ -360,6 +346,7 @@ export default function NowPlayingPage() {
               onTrackSelect={handleTrackSelect}
               onViewAll={handleViewAll}
               maxVisible={8}
+              playlistName={displayPlaylist.name !== 'No Playlist' ? displayPlaylist.name : null}
             />
           </div>
         </div>

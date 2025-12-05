@@ -9,6 +9,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/a
  * Manages playback state (isPlaying, currentTrack, progress)
  * Handles real-time progress updates
  * Syncs with Spotify playback state
+ * Auto-plays next track when current track ends
  * Requirements: 5.3
  */
 export function usePlayback(userId) {
@@ -27,6 +28,8 @@ export function usePlayback(userId) {
   // Refs for progress tracking
   const progressIntervalRef = useRef(null);
   const lastSyncTimeRef = useRef(Date.now());
+  // Ref to track if we're handling track end to prevent duplicate calls
+  const isHandlingTrackEndRef = useRef(false);
 
   /**
    * Calculate progress percentage (0-100)
@@ -342,9 +345,52 @@ export function usePlayback(userId) {
 
 
   /**
+   * Handle track end - auto-play next track
+   * When the current track ends, automatically skip to the next track
+   * If there's no next track (end of playlist), playback stops naturally
+   */
+  const handleTrackEnd = useCallback(async () => {
+    // Prevent duplicate calls
+    if (isHandlingTrackEndRef.current) return;
+    isHandlingTrackEndRef.current = true;
+
+    try {
+      // Fetch current state from Spotify to check if there's a next track
+      const response = await fetch(`${API_BASE_URL}/playback/skip`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          direction: 'forward',
+        }),
+      });
+
+      if (response.ok) {
+        // Successfully skipped to next track, refresh state
+        setTimeout(() => {
+          fetchPlaybackState();
+          isHandlingTrackEndRef.current = false;
+        }, 500);
+      } else {
+        // No next track or error - stop playback
+        setIsPlaying(false);
+        setPosition(duration); // Keep at end position
+        isHandlingTrackEndRef.current = false;
+      }
+    } catch (err) {
+      console.error('Auto-play next track error:', err);
+      setIsPlaying(false);
+      isHandlingTrackEndRef.current = false;
+    }
+  }, [userId, duration, fetchPlaybackState]);
+
+  /**
    * Real-time progress update effect
    * Updates position locally while playing to provide smooth progress
    * Syncs with server periodically to stay accurate
+   * Auto-plays next track when current track ends
    * Requirements: 5.3
    */
   useEffect(() => {
@@ -360,8 +406,10 @@ export function usePlayback(userId) {
         setPosition((prevPosition) => {
           const newPosition = prevPosition + 100;
 
-          // Don't exceed duration
-          if (newPosition >= duration) {
+          // Check if track has ended (with small buffer for timing)
+          if (newPosition >= duration - 100) {
+            // Track ended - trigger auto-play next
+            handleTrackEnd();
             return duration;
           }
 
@@ -387,7 +435,15 @@ export function usePlayback(userId) {
         clearInterval(progressIntervalRef.current);
       }
     };
-  }, [isPlaying, duration, fetchPlaybackState]);
+  }, [isPlaying, duration, fetchPlaybackState, handleTrackEnd]);
+
+  /**
+   * Reset track end handler when track changes
+   * This ensures we can handle the next track end properly
+   */
+  useEffect(() => {
+    isHandlingTrackEndRef.current = false;
+  }, [currentTrack?.id]);
 
   /**
    * Initial state fetch on mount
