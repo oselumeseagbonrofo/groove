@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SplashScreen from '../components/SplashScreen';
 import WelcomeScreen from '../components/WelcomeScreen';
@@ -10,6 +10,24 @@ import WelcomeScreen from '../components/WelcomeScreen';
  * Requirements: 1.1, 1.2, 9.1
  */
 export default function WelcomePage() {
+  return (
+    <Suspense fallback={<WelcomeLoading />}>
+      <WelcomeContent />
+    </Suspense>
+  );
+}
+
+/**
+ * Loading fallback for Suspense boundary
+ */
+function WelcomeLoading() {
+  return <SplashScreen onAnimationComplete={() => { }} duration={2500} />;
+}
+
+/**
+ * Welcome Content - Contains the actual page logic with useSearchParams
+ */
+function WelcomeContent() {
   const [showSplash, setShowSplash] = useState(true);
   const [authError, setAuthError] = useState(null);
   const searchParams = useSearchParams();
@@ -38,7 +56,7 @@ export default function WelcomePage() {
       {authError && (
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 bg-red-500/90 rounded-lg shadow-lg z-50">
           <p className="text-white text-sm">{authError}</p>
-          <button 
+          <button
             onClick={() => setAuthError(null)}
             className="absolute -top-2 -right-2 w-6 h-6 bg-white rounded-full text-red-500 text-sm font-bold"
           >
