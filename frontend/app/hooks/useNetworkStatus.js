@@ -6,15 +6,18 @@ import { useState, useEffect, useCallback } from 'react';
  * useNetworkStatus hook - detects network connectivity changes
  * Requirements: 7.2
  * 
+ * Only tracks actual browser online/offline events (user's internet connection),
+ * not backend API availability.
+ * 
  * @returns {Object} Network status information
  * @returns {boolean} isOnline - Whether the browser is online
  * @returns {boolean} wasOffline - Whether the connection was recently restored
  * @returns {Function} checkConnection - Manual connection check function
  */
 export function useNetworkStatus() {
-  const [isOnline, setIsOnline] = useState(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
+  // Only track browser's navigator.onLine status
+  // This reflects actual internet connectivity, not backend availability
+  const [isOnline, setIsOnline] = useState(true);
   const [wasOffline, setWasOffline] = useState(false);
 
   const handleOnline = useCallback(() => {
@@ -28,10 +31,12 @@ export function useNetworkStatus() {
     setIsOnline(false);
   }, []);
 
-  // Manual connection check by pinging a known endpoint
+  // Manual connection check by pinging the backend health endpoint
   const checkConnection = useCallback(async () => {
     try {
-      const response = await fetch('/api/health', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+      const baseUrl = apiUrl.replace('/api', ''); // Remove /api suffix to get base URL
+      const response = await fetch(`${baseUrl}/health`, {
         method: 'HEAD',
         cache: 'no-store'
       });
