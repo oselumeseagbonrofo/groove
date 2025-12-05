@@ -128,3 +128,30 @@ body {
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
 }
+
+/* Touch gesture feedback - Requirements: 8.5 */
+.swipe-container {
+  touch-action: pan-y; /* Allow vertical scrolling, capture horizontal swipes */
+}
+
+/* Prevent accidental text selection during swipe gestures */
+.swipe-container * {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Re-enable text selection for specific elements */
+.swipe-container input,
+.swipe-container textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Active state feedback for touch interactions */
+@media (hover: none) and (pointer: coarse) {
+  /* Touch device specific styles */
+  .touch-target:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease-out;
+  }
+}

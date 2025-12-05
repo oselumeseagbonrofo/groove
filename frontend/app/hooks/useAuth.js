@@ -5,8 +5,8 @@ import { useState, useCallback } from 'react';
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 /**
- * useAuth - Authentication hook for Spotify and Apple Music
- * Requirements: 1.3, 1.4, 1.5, 1.6, 1.7
+ * useAuth - Authentication hook for Spotify
+ * Requirements: 1.3, 1.5, 1.6, 1.7
  */
 export function useAuth() {
   const [loading, setLoading] = useState(false);
@@ -45,80 +45,6 @@ export function useAuth() {
   }, []);
 
   /**
-   * Initiate Apple Music OAuth flow
-   * Requirements: 1.4
-   */
-  const connectAppleMusic = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/apple`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to initiate Apple Music authentication');
-      }
-
-      const { developerToken, state } = await response.json();
-      
-      // Store state for callback validation
-      sessionStorage.setItem('apple_auth_state', state);
-      
-      // Initialize MusicKit JS (Apple's client-side auth library)
-      // This requires the MusicKit JS script to be loaded
-      if (typeof window !== 'undefined' && window.MusicKit) {
-        await window.MusicKit.configure({
-          developerToken,
-          app: {
-            name: 'Groove',
-            build: '1.0.0',
-          },
-        });
-        
-        const music = window.MusicKit.getInstance();
-        const musicUserToken = await music.authorize();
-        
-        // Send the token to our backend
-        const callbackResponse = await fetch(`${API_BASE_URL}/auth/apple/callback`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            musicUserToken,
-            state,
-          }),
-        });
-
-        if (!callbackResponse.ok) {
-          const errorData = await callbackResponse.json();
-          throw new Error(errorData.error?.message || 'Apple Music authentication failed');
-        }
-
-        const { userId, provider } = await callbackResponse.json();
-        
-        // Store user info and redirect
-        sessionStorage.setItem('userId', userId);
-        sessionStorage.setItem('provider', provider);
-        window.location.href = `/now-playing?userId=${userId}&provider=${provider}`;
-      } else {
-        // MusicKit not available - show error or fallback
-        throw new Error('Apple Music is not available. Please ensure MusicKit JS is loaded.');
-      }
-    } catch (err) {
-      setError(err.message);
-      setLoading(false);
-      throw err;
-    }
-  }, []);
-
-  /**
    * Logout and clear authentication data
    * Requirements: 1.7
    */
@@ -142,7 +68,6 @@ export function useAuth() {
       // Clear local storage
       sessionStorage.removeItem('userId');
       sessionStorage.removeItem('provider');
-      sessionStorage.removeItem('apple_auth_state');
       
       // Redirect to welcome screen
       window.location.href = '/welcome';
@@ -201,7 +126,6 @@ export function useAuth() {
     loading,
     error,
     connectSpotify,
-    connectAppleMusic,
     logout,
     checkAuthStatus,
     refreshToken,

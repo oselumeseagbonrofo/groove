@@ -9,6 +9,7 @@ import {
   TrackQueue, 
   TrackInfo 
 } from '../components';
+import useSwipeGesture from '../hooks/useSwipeGesture';
 
 /**
  * Now Playing Page - Main playback interface with vinyl turntable
@@ -120,6 +121,28 @@ export default function NowPlayingPage() {
     console.log('View all tracks');
   }, []);
 
+  /**
+   * Touch Gesture Support - Requirements: 8.5
+   * Swipe left to skip forward, swipe right to skip backward
+   */
+  const handleSwipeLeft = useCallback(() => {
+    // Swipe left = skip forward to next track
+    handleSkipForward();
+  }, [handleSkipForward]);
+
+  const handleSwipeRight = useCallback(() => {
+    // Swipe right = skip backward (always go to previous track on swipe)
+    // Using false to go to previous track rather than restart
+    handleSkipBackward(false);
+  }, [handleSkipBackward]);
+
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: handleSwipeLeft,
+    onSwipeRight: handleSwipeRight,
+    threshold: 50,
+    maxVerticalMovement: 100
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-dark via-pink-medium to-lavender">
       {/* Header with dark styling for Now Playing */}
@@ -138,7 +161,11 @@ export default function NowPlayingPage() {
       />
 
       {/* Main Content Area - Responsive layout: stacked on mobile, side-by-side on desktop */}
-      <main className="pt-14 sm:pt-16 px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 safe-area-bottom max-w-7xl mx-auto">
+      {/* Swipe gesture handlers applied for track navigation (Requirements: 8.5) */}
+      <main 
+        className="pt-14 sm:pt-16 px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 safe-area-bottom max-w-7xl mx-auto swipe-container"
+        {...swipeHandlers}
+      >
         {/* Desktop: Two-column layout */}
         <div className="lg:flex lg:gap-8 lg:items-start lg:pt-4">
           {/* Left Column: Turntable and Controls */}

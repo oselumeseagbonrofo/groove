@@ -1,4 +1,5 @@
 'use client';
+import Image from "next/image";
 
 /**
  * VinylPreview - Real-time vinyl preview with selected color and image
@@ -69,7 +70,7 @@ export default function VinylPreview({
         >
           {hasImage ? (
             /* Display selected image */
-            <img 
+            <Image 
               src={image.url || image.previewUrl} 
               alt={image.name || 'Custom label'}
               className="w-full h-full object-cover"

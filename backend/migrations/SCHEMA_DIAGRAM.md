@@ -10,7 +10,7 @@ erDiagram
     
     users {
         uuid id PK
-        varchar provider "spotify or apple"
+        varchar provider "spotify"
         varchar provider_id
         varchar email
         varchar display_name
@@ -120,7 +120,7 @@ Triggered before UPDATE operations to maintain accurate modification timestamps.
 
 ### User Authentication Flow
 ```
-1. User authenticates with Spotify/Apple Music
+1. User authenticates with Spotify
 2. Backend receives OAuth tokens
 3. INSERT into users (if new) or SELECT existing user
 4. INSERT into auth_tokens with access_token, refresh_token, expires_at
@@ -131,7 +131,7 @@ Triggered before UPDATE operations to maintain accurate modification timestamps.
 ```
 1. Frontend detects token expiration
 2. Backend SELECT auth_tokens WHERE user_id = ? AND expires_at < NOW()
-3. Call Spotify/Apple Music refresh endpoint
+3. Call Spotify refresh endpoint
 4. UPDATE auth_tokens SET access_token = ?, expires_at = ?
 5. Return new token to frontend
 ```
@@ -159,7 +159,7 @@ Triggered before UPDATE operations to maintain accurate modification timestamps.
 - `vinyl_designs(user_id, playlist_id)` - One design per playlist per user
 
 ### Check Constraints
-- `users.provider` must be 'spotify' or 'apple'
+- `users.provider` must be 'spotify'
 - `vinyl_designs.color` should be 7 characters (hex format #RRGGBB)
 
 ### Foreign Key Constraints

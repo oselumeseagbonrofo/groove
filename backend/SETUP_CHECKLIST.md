@@ -46,7 +46,6 @@ Use this checklist to ensure your Supabase database is properly configured for G
 - [ ] Removed `SUPABASE_SERVICE_ROLE_KEY` from `.env` (keep it secure!)
 - [ ] Verified `SUPABASE_ANON_KEY` is set for application use
 - [ ] Configured Spotify OAuth credentials
-- [ ] Configured Apple Music credentials (if using)
 
 ## Documentation Review
 
@@ -60,7 +59,6 @@ Use this checklist to ensure your Supabase database is properly configured for G
 - [ ] Implement playlist endpoints (`/api/playlists`)
 - [ ] Implement playback endpoints (`/api/playback/*`)
 - [ ] Test OAuth flow with Spotify
-- [ ] Test OAuth flow with Apple Music (if using)
 
 ## Troubleshooting
 

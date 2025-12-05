@@ -17,7 +17,6 @@ cp .env.example .env
 3. Configure your environment variables:
    - Supabase URL and API key
    - Spotify OAuth credentials
-   - Apple Music credentials (optional)
 
 4. Set up the database schema:
    - See [DATABASE_SETUP.md](./DATABASE_SETUP.md) for detailed instructions
@@ -82,11 +81,12 @@ backend/
 ### Health Check
 - `GET /health` - Check if the server is running
 
-### Authentication (to be implemented)
+### Authentication
 - `POST /api/auth/spotify` - Initiate Spotify OAuth
-- `POST /api/auth/apple` - Initiate Apple Music OAuth
-- `POST /api/auth/callback` - Handle OAuth callback
+- `GET /api/auth/callback` - Handle OAuth callback
 - `POST /api/auth/refresh` - Refresh access token
+- `POST /api/auth/logout` - Clear authentication data
+- `GET /api/auth/status/:userId` - Check authentication status
 - `POST /api/auth/logout` - Clear session
 
 ### Playlists (to be implemented)

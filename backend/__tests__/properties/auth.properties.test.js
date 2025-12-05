@@ -228,33 +228,5 @@ describe('Property Tests: Authentication', () => {
       );
     });
 
-    it('should handle Apple Music token expiration correctly', () => {
-      fc.assert(
-        fc.property(
-          validAccessTokenArb,
-          expiredTimestampArb,
-          (accessToken, expiresAt) => {
-            const tokenData = {
-              access_token: accessToken,
-              refresh_token: '', // Apple Music doesn't use refresh tokens
-              expires_at: expiresAt
-            };
-            
-            const result = processRefreshResult({
-              tokenData,
-              refreshResult: null,
-              provider: 'apple'
-            });
-            
-            // For expired Apple Music tokens, re-auth is required
-            return (
-              result.success === false &&
-              result.error.code === 'AUTH_EXPIRED'
-            );
-          }
-        ),
-        PBT_CONFIG
-      );
-    });
   });
 });

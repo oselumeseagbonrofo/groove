@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
 
 /**
  * ImageUpload - File input with drag-and-drop support for custom vinyl images
@@ -168,7 +169,7 @@ export default function ImageUpload({
           {preview ? (
             <div className="space-y-4">
               <div className="w-32 h-32 mx-auto rounded-lg overflow-hidden shadow-md">
-                <img 
+                <Image 
                   src={preview} 
                   alt="Preview" 
                   className="w-full h-full object-cover"

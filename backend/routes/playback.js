@@ -117,35 +117,28 @@ router.post('/play', async (req, res) => {
 
     const { user, accessToken } = authResult.data;
 
-    if (user.provider === 'spotify') {
-      const result = await spotifyPlay(accessToken, { playlistId, trackUri, deviceId });
-      if (!result.success) {
-        await logError(userId, 'PLAYBACK_PLAY_ERROR', result.error, req.path);
-        return res.status(result.status || 500).json({
-          error: {
-            message: result.error,
-            code: 'PLAYBACK_FAILED',
-            retryable: true
-          }
-        });
-      }
-      return res.json({ success: true, message: 'Playback started' });
-    } else if (user.provider === 'apple') {
-      // Apple Music playback is handled client-side via MusicKit JS
-      return res.json({
-        success: true,
-        message: 'Apple Music playback should be controlled via MusicKit JS',
-        clientSide: true
+    if (user.provider !== 'spotify') {
+      return res.status(400).json({
+        error: {
+          message: 'Unknown music provider',
+          code: 'UNKNOWN_PROVIDER',
+          retryable: false
+        }
       });
     }
 
-    return res.status(400).json({
-      error: {
-        message: 'Unknown music provider',
-        code: 'UNKNOWN_PROVIDER',
-        retryable: false
-      }
-    });
+    const result = await spotifyPlay(accessToken, { playlistId, trackUri, deviceId });
+    if (!result.success) {
+      await logError(userId, 'PLAYBACK_PLAY_ERROR', result.error, req.path);
+      return res.status(result.status || 500).json({
+        error: {
+          message: result.error,
+          code: 'PLAYBACK_FAILED',
+          retryable: true
+        }
+      });
+    }
+    return res.json({ success: true, message: 'Playback started' });
   } catch (error) {
     console.error('Play error:', error);
     await logError(userId, 'PLAYBACK_PLAY_ERROR', error.message, req.path);
@@ -175,34 +168,28 @@ router.post('/pause', async (req, res) => {
 
     const { user, accessToken } = authResult.data;
 
-    if (user.provider === 'spotify') {
-      const result = await spotifyPause(accessToken, deviceId);
-      if (!result.success) {
-        await logError(userId, 'PLAYBACK_PAUSE_ERROR', result.error, req.path);
-        return res.status(result.status || 500).json({
-          error: {
-            message: result.error,
-            code: 'PAUSE_FAILED',
-            retryable: true
-          }
-        });
-      }
-      return res.json({ success: true, message: 'Playback paused' });
-    } else if (user.provider === 'apple') {
-      return res.json({
-        success: true,
-        message: 'Apple Music playback should be controlled via MusicKit JS',
-        clientSide: true
+    if (user.provider !== 'spotify') {
+      return res.status(400).json({
+        error: {
+          message: 'Unknown music provider',
+          code: 'UNKNOWN_PROVIDER',
+          retryable: false
+        }
       });
     }
 
-    return res.status(400).json({
-      error: {
-        message: 'Unknown music provider',
-        code: 'UNKNOWN_PROVIDER',
-        retryable: false
-      }
-    });
+    const result = await spotifyPause(accessToken, deviceId);
+    if (!result.success) {
+      await logError(userId, 'PLAYBACK_PAUSE_ERROR', result.error, req.path);
+      return res.status(result.status || 500).json({
+        error: {
+          message: result.error,
+          code: 'PAUSE_FAILED',
+          retryable: true
+        }
+      });
+    }
+    return res.json({ success: true, message: 'Playback paused' });
   } catch (error) {
     console.error('Pause error:', error);
     await logError(userId, 'PLAYBACK_PAUSE_ERROR', error.message, req.path);
@@ -243,34 +230,28 @@ router.post('/seek', async (req, res) => {
       });
     }
 
-    if (user.provider === 'spotify') {
-      const result = await spotifySeek(accessToken, positionMs, deviceId);
-      if (!result.success) {
-        await logError(userId, 'PLAYBACK_SEEK_ERROR', result.error, req.path);
-        return res.status(result.status || 500).json({
-          error: {
-            message: result.error,
-            code: 'SEEK_FAILED',
-            retryable: true
-          }
-        });
-      }
-      return res.json({ success: true, positionMs, message: 'Seek successful' });
-    } else if (user.provider === 'apple') {
-      return res.json({
-        success: true,
-        message: 'Apple Music playback should be controlled via MusicKit JS',
-        clientSide: true
+    if (user.provider !== 'spotify') {
+      return res.status(400).json({
+        error: {
+          message: 'Unknown music provider',
+          code: 'UNKNOWN_PROVIDER',
+          retryable: false
+        }
       });
     }
 
-    return res.status(400).json({
-      error: {
-        message: 'Unknown music provider',
-        code: 'UNKNOWN_PROVIDER',
-        retryable: false
-      }
-    });
+    const result = await spotifySeek(accessToken, positionMs, deviceId);
+    if (!result.success) {
+      await logError(userId, 'PLAYBACK_SEEK_ERROR', result.error, req.path);
+      return res.status(result.status || 500).json({
+        error: {
+          message: result.error,
+          code: 'SEEK_FAILED',
+          retryable: true
+        }
+      });
+    }
+    return res.json({ success: true, positionMs, message: 'Seek successful' });
   } catch (error) {
     console.error('Seek error:', error);
     await logError(userId, 'PLAYBACK_SEEK_ERROR', error.message, req.path);
@@ -310,37 +291,31 @@ router.post('/skip', async (req, res) => {
       });
     }
 
-    if (user.provider === 'spotify') {
-      const result = direction === 'forward'
-        ? await spotifySkipNext(accessToken, deviceId)
-        : await spotifySkipPrevious(accessToken, deviceId);
-
-      if (!result.success) {
-        await logError(userId, 'PLAYBACK_SKIP_ERROR', result.error, req.path);
-        return res.status(result.status || 500).json({
-          error: {
-            message: result.error,
-            code: 'SKIP_FAILED',
-            retryable: true
-          }
-        });
-      }
-      return res.json({ success: true, direction, message: `Skipped ${direction}` });
-    } else if (user.provider === 'apple') {
-      return res.json({
-        success: true,
-        message: 'Apple Music playback should be controlled via MusicKit JS',
-        clientSide: true
+    if (user.provider !== 'spotify') {
+      return res.status(400).json({
+        error: {
+          message: 'Unknown music provider',
+          code: 'UNKNOWN_PROVIDER',
+          retryable: false
+        }
       });
     }
 
-    return res.status(400).json({
-      error: {
-        message: 'Unknown music provider',
-        code: 'UNKNOWN_PROVIDER',
-        retryable: false
-      }
-    });
+    const result = direction === 'forward'
+      ? await spotifySkipNext(accessToken, deviceId)
+      : await spotifySkipPrevious(accessToken, deviceId);
+
+    if (!result.success) {
+      await logError(userId, 'PLAYBACK_SKIP_ERROR', result.error, req.path);
+      return res.status(result.status || 500).json({
+        error: {
+          message: result.error,
+          code: 'SKIP_FAILED',
+          retryable: true
+        }
+      });
+    }
+    return res.json({ success: true, direction, message: `Skipped ${direction}` });
   } catch (error) {
     console.error('Skip error:', error);
     await logError(userId, 'PLAYBACK_SKIP_ERROR', error.message, req.path);
@@ -371,30 +346,18 @@ router.get('/state', async (req, res) => {
 
     const { user, accessToken } = authResult.data;
 
-    if (user.provider === 'spotify') {
-      const state = await getSpotifyPlaybackState(accessToken);
-      return res.json(state);
-    } else if (user.provider === 'apple') {
-      // Apple Music state is managed client-side via MusicKit JS
-      return res.json({
-        isPlaying: false,
-        currentTrack: null,
-        position: 0,
-        duration: 0,
-        playlistId: null,
-        trackIndex: 0,
-        clientSide: true,
-        message: 'Apple Music state should be retrieved via MusicKit JS'
+    if (user.provider !== 'spotify') {
+      return res.status(400).json({
+        error: {
+          message: 'Unknown music provider',
+          code: 'UNKNOWN_PROVIDER',
+          retryable: false
+        }
       });
     }
 
-    return res.status(400).json({
-      error: {
-        message: 'Unknown music provider',
-        code: 'UNKNOWN_PROVIDER',
-        retryable: false
-      }
-    });
+    const state = await getSpotifyPlaybackState(accessToken);
+    return res.json(state);
   } catch (error) {
     console.error('Get state error:', error);
     await logError(req.query.userId, 'PLAYBACK_STATE_ERROR', error.message, req.path);

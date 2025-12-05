@@ -5,7 +5,7 @@ This directory contains SQL migration files for setting up the Groove Vinyl Spot
 ## Overview
 
 The database schema includes:
-- **users**: User accounts from Spotify or Apple Music
+- **users**: User accounts from Spotify
 - **auth_tokens**: OAuth access and refresh tokens
 - **vinyl_designs**: Custom vinyl record designs for playlists
 - **error_logs**: Application error logging
@@ -18,6 +18,7 @@ Run these migrations in order:
 1. **001_initial_schema.sql** - Creates core tables and indexes
 2. **002_rls_policies.sql** - Sets up Row Level Security policies
 3. **003_storage_setup.sql** - Creates storage bucket for vinyl images
+4. **004_add_auth_tokens_unique_constraint.sql** - Adds unique constraint on auth_tokens.user_id
 
 ## Setup Methods
 
@@ -43,7 +44,26 @@ supabase link --project-ref your-project-ref
 supabase db push
 ```
 
-### Method 3: Setup Script
+### Method 3: Migration Script (Recommended for new migrations)
+
+Run the Node.js migration script:
+
+```bash
+# Run all pending migrations
+npm run db:migrate
+
+# Run a specific migration
+npm run db:migrate 004
+```
+
+The script will:
+- Track which migrations have been applied
+- Show you the SQL to run in Supabase dashboard
+- Guide you through the process
+
+**Note**: You'll need to manually execute the SQL in Supabase dashboard and then mark it as applied.
+
+### Method 4: Setup Script
 
 Run the Node.js setup script (requires service role key):
 

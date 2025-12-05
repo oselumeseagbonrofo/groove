@@ -5,10 +5,10 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users table
--- Stores user information from Spotify or Apple Music
+-- Stores user information from Spotify
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  provider VARCHAR(20) NOT NULL CHECK (provider IN ('spotify', 'apple')),
+  provider VARCHAR(20) NOT NULL CHECK (provider IN ('spotify')),
   provider_id VARCHAR(255) NOT NULL,
   email VARCHAR(255),
   display_name VARCHAR(255),

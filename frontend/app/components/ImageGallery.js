@@ -1,5 +1,7 @@
 'use client';
 
+import Image from "next/image";
+
 /**
  * ImageGallery - Preset image selection for vinyl label
  * Displays preset image options and handles image selection
@@ -63,7 +65,9 @@ export default function ImageGallery({
             aria-label={`Select ${image.name}`}
           >
             {image.url ? (
-              <img 
+              <Image
+              width={250}
+              height={250}
                 src={image.url} 
                 alt={image.name}
                 className="w-full h-full object-cover"

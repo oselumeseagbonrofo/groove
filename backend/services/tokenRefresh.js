@@ -1,7 +1,7 @@
 /**
  * Token Refresh Service
  * 
- * Handles token refresh logic for Spotify and Apple Music authentication.
+ * Handles token refresh logic for Spotify authentication.
  * This module is designed to be testable with property-based testing.
  * 
  * Requirements: 1.6
@@ -58,32 +58,21 @@ export function validateRefreshToken(refreshToken) {
  * @param {Object} params - Parameters for processing refresh
  * @param {Object} params.tokenData - Current token data from database
  * @param {Object} params.refreshResult - Result from the refresh operation
- * @param {string} params.provider - The authentication provider ('spotify' | 'apple')
+ * @param {string} params.provider - The authentication provider ('spotify')
  * @returns {Object} - Processed result with new token data or error
  */
 export function processRefreshResult({ tokenData, refreshResult, provider }) {
-  // For Apple Music, tokens don't refresh the same way
-  if (provider === 'apple') {
-    const expiresAt = new Date(tokenData.expires_at);
-    if (new Date() > expiresAt) {
-      return {
-        success: false,
-        error: {
-          message: 'Apple Music authorization expired. Please re-authenticate.',
-          code: 'AUTH_EXPIRED',
-          retryable: false
-        }
-      };
-    }
+  if (provider !== 'spotify') {
     return {
-      success: true,
-      accessToken: tokenData.access_token,
-      expiresAt: tokenData.expires_at,
-      refreshed: false
+      success: false,
+      error: {
+        message: 'Unknown provider',
+        code: 'UNKNOWN_PROVIDER',
+        retryable: false
+      }
     };
   }
 
-  // For Spotify
   if (!refreshResult || !refreshResult.success) {
     return {
       success: false,
@@ -121,13 +110,8 @@ export function determineRefreshAction({ provider, tokenData, bufferMs = 5 * 60 
     return { action: 'none', reason: 'Token still valid' };
   }
 
-  // For Apple Music, if token is expired, require re-authentication
-  if (provider === 'apple') {
-    const expiresAt = new Date(tokenData.expires_at);
-    if (new Date() > expiresAt) {
-      return { action: 'reauth', reason: 'Apple Music token expired' };
-    }
-    return { action: 'none', reason: 'Apple Music token still valid' };
+  if (provider !== 'spotify') {
+    return { action: 'reauth', reason: 'Unknown provider' };
   }
 
   // For Spotify, check if we have a valid refresh token

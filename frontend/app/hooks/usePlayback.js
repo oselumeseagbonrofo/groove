@@ -8,7 +8,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/a
  * usePlayback - Playback state management hook
  * Manages playback state (isPlaying, currentTrack, progress)
  * Handles real-time progress updates
- * Syncs with Spotify/Apple Music playback state
+ * Syncs with Spotify playback state
  * Requirements: 5.3
  */
 export function usePlayback(userId) {
@@ -54,11 +54,6 @@ export function usePlayback(userId) {
       }
 
       const state = await response.json();
-      
-      // Handle client-side playback (Apple Music)
-      if (state.clientSide) {
-        return state;
-      }
 
       setIsPlaying(state.isPlaying);
       setCurrentTrack(state.currentTrack);

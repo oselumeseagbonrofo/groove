@@ -18,7 +18,6 @@
 ## External APIs
 
 - Spotify Web API (OAuth 2.0)
-- Apple Music API (MusicKit JS)
 
 ## Code Quality
 

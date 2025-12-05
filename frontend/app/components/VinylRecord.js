@@ -1,4 +1,5 @@
 'use client';
+import Image from "next/image";
 
 /**
  * VinylRecord - Individual vinyl representation for My Shelf
@@ -58,7 +59,7 @@ export default function VinylRecord({
         {/* Center Label */}
         <div className="absolute inset-0 m-auto w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full overflow-hidden shadow-inner">
           {hasValidCover ? (
-            <img 
+            <Image 
               src={labelImage} 
               alt={playlist?.name || 'Playlist cover'}
               className="w-full h-full object-cover"

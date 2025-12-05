@@ -87,7 +87,7 @@ Expected tables:
 ```
 users
 ├── id (UUID, PK)
-├── provider (spotify/apple)
+├── provider (spotify)
 ├── provider_id
 ├── email
 └── display_name
@@ -189,7 +189,7 @@ After database setup is complete:
 2. ⏭️ Implement authentication endpoints (`/api/auth/*`)
 3. ⏭️ Implement playlist endpoints (`/api/playlists`)
 4. ⏭️ Implement playback endpoints (`/api/playback/*`)
-5. ⏭️ Test OAuth flow with Spotify/Apple Music
+5. ⏭️ Test OAuth flow with Spotify
 
 ## Need Help?
 

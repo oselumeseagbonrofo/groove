@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import Image from 'next/image';
 
 /**
  * VinylTurntable - Main playback visualization component
@@ -80,7 +81,9 @@ export default function VinylTurntable({
   }, []);
 
   const handleTouchStart = useCallback((e) => {
-    e.preventDefault();
+    // Stop propagation to prevent swipe gesture handlers from triggering
+    // when user is interacting with the vinyl for seeking
+    e.stopPropagation();
     setIsDragging(true);
     
     const touch = e.touches[0];
@@ -151,7 +154,7 @@ export default function VinylTurntable({
           {/* Center Label - Shows playlist cover or default Groove logo */}
           <div className="absolute inset-0 m-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full overflow-hidden shadow-inner">
             {coverImage ? (
-              <img 
+              <Image 
                 src={coverImage} 
                 alt={playlist?.name || 'Album cover'}
                 className="w-full h-full object-cover"
