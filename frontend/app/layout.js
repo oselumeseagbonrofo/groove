@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Groove - Vinyl Spotify Player",
   description: "Experience your music collection with a nostalgic vinyl record player interface",
+  icons: {
+    icon: '/groove.png',
+  },
 };
 
 /**

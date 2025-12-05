@@ -46,56 +46,69 @@ export default function VinylPreview({
 
   return (
     <div className="flex flex-col items-center">
-      {/* Vinyl Record */}
-      <div
-        className={`${sizeClasses[size]} rounded-full shadow-2xl relative`}
-        style={{ backgroundColor: '#1a1a1a' }}
-        role="img"
-        aria-label={`Vinyl preview for ${playlistName || 'new playlist'}`}
-      >
-        {/* Vinyl Grooves Texture */}
-        <div className="absolute inset-2 rounded-full border border-gray-700 opacity-40" />
-        <div className="absolute inset-4 rounded-full border border-gray-700 opacity-35" />
-        <div className="absolute inset-6 rounded-full border border-gray-700 opacity-30" />
-        <div className="absolute inset-8 rounded-full border border-gray-700 opacity-25" />
-        <div className="absolute inset-10 rounded-full border border-gray-700 opacity-20" />
-
-        {/* Vinyl Shine Effect */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 via-transparent to-transparent" />
-
-        {/* Center Label */}
-        <div
-          className={`absolute inset-0 m-auto ${labelSizeClasses[size]} rounded-full overflow-hidden shadow-inner flex items-center justify-center transition-all duration-200`}
-          style={{ backgroundColor: hasImage || hasGradient ? undefined : color }}
+      {/* Album Cover and Vinyl Container */}
+      <div className="relative flex items-center justify-center">
+        {/* Album Cover Sleeve */}
+        <div 
+          className={`${sizeClasses[size]} bg-white shadow-2xl relative z-10 flex items-center justify-center`}
+          style={{ aspectRatio: '1/1' }}
         >
           {hasImage ? (
-            /* Display selected image */
-            <Image
-              width={250}
-              height={250}
-              src={image.url || image.previewUrl}
-              alt={image.name || 'Custom label'}
+            <img 
+              src={image.url || image.previewUrl} 
+              alt={image.name || 'Album cover'}
               className="w-full h-full object-cover"
             />
           ) : hasGradient ? (
-            /* Display gradient preset */
-            <div
-              className={`w-full h-full bg-gradient-to-br ${image.gradient} flex items-center justify-center`}
-            >
-              <span className={`text-white font-bold ${textSizeClasses[size]}`}>
-                {displayLetter}
-              </span>
-            </div>
+            <div 
+              className={`w-full h-full bg-gradient-to-br ${image.gradient}`}
+            />
           ) : (
-            /* Display color with letter */
-            <span className={`text-white font-bold ${textSizeClasses[size]}`}>
-              {displayLetter}
-            </span>
+            <div 
+              className="w-full h-full"
+              style={{ backgroundColor: color }}
+            />
           )}
         </div>
 
-        {/* Center Spindle Hole */}
-        <div className="absolute inset-0 m-auto w-2 h-2 rounded-full bg-gray-800 shadow-inner" />
+        {/* Vinyl Record - Partially visible on the right */}
+        <div 
+          className={`${sizeClasses[size]} rounded-full shadow-2xl absolute -right-16 sm:-right-20 md:-right-24 z-0`}
+          style={{ backgroundColor: '#1a1a1a' }}
+          role="img"
+          aria-label={`Vinyl preview for ${playlistName || 'new playlist'}`}
+        >
+          {/* Vinyl Grooves Texture */}
+          <div className="absolute inset-2 rounded-full border border-gray-700 opacity-40" />
+          <div className="absolute inset-4 rounded-full border border-gray-700 opacity-35" />
+          <div className="absolute inset-6 rounded-full border border-gray-700 opacity-30" />
+          <div className="absolute inset-8 rounded-full border border-gray-700 opacity-25" />
+          <div className="absolute inset-10 rounded-full border border-gray-700 opacity-20" />
+          
+          {/* Vinyl Shine Effect */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 via-transparent to-transparent" />
+          
+          {/* Center Label */}
+          <div 
+            className={`absolute inset-0 m-auto ${labelSizeClasses[size]} rounded-full overflow-hidden shadow-inner flex items-center justify-center`}
+            style={{ backgroundColor: hasImage || hasGradient ? undefined : color }}
+          >
+            {hasImage ? (
+              <img 
+                src={image.url || image.previewUrl} 
+                alt={image.name || 'Vinyl label'}
+                className="w-full h-full object-cover"
+              />
+            ) : hasGradient ? (
+              <div 
+                className={`w-full h-full bg-gradient-to-br ${image.gradient}`}
+              />
+            ) : (
+              <div className="w-full h-full" />
+            )}
+            <div className="absolute inset-0 m-auto w-2 h-2 rounded-full bg-gray-600 shadow-inner" />
+          </div>
+        </div>
       </div>
 
       {/* Playlist Name Display */}

@@ -33,15 +33,15 @@ export default function VinylCreator({
   // Handle color selection - Property 9: Color Picker Real-time Update
   const handleColorSelect = useCallback((color) => {
     setSelectedColor(color);
-    // Clear image selection when color is selected (unless it's a custom upload)
-    if (selectedImage && !selectedImage.previewUrl) {
-      setSelectedImage(null);
-    }
-  }, [selectedImage]);
+    // Clear image selection when color is selected
+    setSelectedImage(null);
+  }, []);
 
   // Handle image selection from gallery - Property 10: Image Selection Application
   const handleImageSelect = useCallback((image) => {
     setSelectedImage(image);
+    // Clear color selection when image is selected
+    setSelectedColor(null);
   }, []);
 
   // Handle upload button click
@@ -122,7 +122,8 @@ export default function VinylCreator({
           onChange={(e) => setPlaylistName(e.target.value)}
           placeholder="Enter playlist name"
           maxLength={100}
-          className="w-full px-3 sm:px-4 py-3 sm:py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-primary focus:border-transparent outline-none transition-shadow text-base"
+          className="w-full px-3 sm:px-4 py-3 sm:py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow text-base text-black"
+          style={{ '--tw-ring-color': '#b149c2' }}
         />
       </div>
 
@@ -141,7 +142,8 @@ export default function VinylCreator({
           placeholder="Add a description for your playlist"
           maxLength={300}
           rows={3}
-          className="w-full px-3 sm:px-4 py-3 sm:py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-primary focus:border-transparent outline-none transition-shadow resize-none text-base"
+          className="w-full px-3 sm:px-4 py-3 sm:py-3.5 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent outline-none transition-shadow resize-none text-base text-black"
+          style={{ '--tw-ring-color': '#b149c2' }}
         />
       </div>
 
@@ -177,7 +179,10 @@ export default function VinylCreator({
         type="button"
         onClick={handleCreatePlaylist}
         disabled={!isFormValid || isCreating}
-        className="w-full py-3.5 sm:py-4 bg-teal-primary text-white font-semibold rounded-full shadow-lg hover:bg-teal-primary/90 active:bg-teal-primary/80 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed touch-target"
+        className="w-full py-3.5 sm:py-4 text-white font-semibold rounded-full shadow-lg active:scale-[0.98] transition-all  disabled:cursor-not-allowed touch-target"
+        style={{ backgroundColor: '#3d2b5e' }}
+        onMouseEnter={(e) => !isCreating && !(!isFormValid) && (e.currentTarget.style.backgroundColor = '#3d2b5e')}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3d2b5e'}
       >
         {isCreating ? (
           <span className="flex items-center justify-center gap-2">

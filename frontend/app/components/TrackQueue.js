@@ -30,7 +30,7 @@ export default function TrackQueue({
 
   if (tracks.length === 0) {
     return (
-      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4">
+      <div className="backdrop-blur-sm rounded-xl p-3 sm:p-4 mx-auto max-w-md" style={{ backgroundColor: 'rgba(150, 39, 157, 0.3)' }}>
         <h3 className="text-white font-semibold mb-2 text-sm sm:text-base">Up Next</h3>
         <p className="text-white/60 text-xs sm:text-sm">No tracks in queue</p>
       </div>
@@ -38,7 +38,7 @@ export default function TrackQueue({
   }
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 sm:p-4">
+    <div className="backdrop-blur-sm rounded-xl p-3 sm:p-4 mx-auto max-w-md" style={{ backgroundColor: 'rgba(150, 39, 157, 0.3)' }}>
       <div className="flex items-center justify-between mb-2 sm:mb-3">
         <h3 className="text-white font-semibold text-sm sm:text-base">Up Next</h3>
         {hasMoreTracks && (
@@ -68,8 +68,8 @@ export default function TrackQueue({
               >
                 {/* Track Number or Playing Indicator */}
                 <span className={`w-5 sm:w-6 text-center text-xs sm:text-sm flex-shrink-0 ${
-                  isCurrent ? 'text-teal-primary' : 'text-white/50'
-                }`}>
+                  isCurrent ? '' : 'text-white/50'
+                }`} style={isCurrent ? { color: '#96279d' } : {}}>
                   {isCurrent ? (
                     <svg className="w-3 h-3 sm:w-4 sm:h-4 mx-auto" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z" />

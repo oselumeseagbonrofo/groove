@@ -55,12 +55,15 @@ export default function ColorPicker({
             role="radio"
             aria-checked={selectedColor === color}
             onClick={() => handleColorClick(color)}
-            className={`w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-full transition-all duration-150 border-2 touch-target ${
+            className={`w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg transition-all duration-150 touch-target ${
               selectedColor === color 
-                ? 'ring-2 ring-offset-2 ring-teal-primary scale-110 border-white shadow-lg' 
-                : 'border-transparent hover:scale-105 active:scale-95 hover:shadow-md'
+                ? 'ring-2 ring-offset-2 scale-110 shadow-lg' 
+                : 'hover:scale-105 active:scale-95'
             }`}
-            style={{ backgroundColor: color }}
+            style={{ 
+              backgroundColor: color,
+              ...(selectedColor === color && { '--tw-ring-color': '#b149c2' })
+            }}
             aria-label={`Select color ${color}`}
           />
         ))}
