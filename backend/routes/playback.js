@@ -158,7 +158,7 @@ router.post('/play', async (req, res) => {
  * Requirements: 3.3
  */
 router.post('/pause', async (req, res) => {
-  const { userId, deviceId } = req.body;
+  const { userId } = req.body;
 
   try {
     const authResult = await getUserToken(userId);
@@ -178,7 +178,7 @@ router.post('/pause', async (req, res) => {
       });
     }
 
-    const result = await spotifyPause(accessToken, deviceId);
+    const result = await spotifyPause(accessToken);
     if (!result.success) {
       await logError(userId, 'PLAYBACK_PAUSE_ERROR', result.error, req.path);
       return res.status(result.status || 500).json({
@@ -210,7 +210,7 @@ router.post('/pause', async (req, res) => {
  * Requirements: 3.4
  */
 router.post('/seek', async (req, res) => {
-  const { userId, positionMs, deviceId } = req.body;
+  const { userId, positionMs } = req.body;
 
   try {
     const authResult = await getUserToken(userId);
@@ -240,7 +240,7 @@ router.post('/seek', async (req, res) => {
       });
     }
 
-    const result = await spotifySeek(accessToken, positionMs, deviceId);
+    const result = await spotifySeek(accessToken, positionMs);
     if (!result.success) {
       await logError(userId, 'PLAYBACK_SEEK_ERROR', result.error, req.path);
       return res.status(result.status || 500).json({
@@ -271,7 +271,7 @@ router.post('/seek', async (req, res) => {
  * Requirements: 3.5, 3.6
  */
 router.post('/skip', async (req, res) => {
-  const { userId, direction, deviceId } = req.body;
+  const { userId, direction } = req.body;
 
   try {
     const authResult = await getUserToken(userId);
@@ -302,8 +302,8 @@ router.post('/skip', async (req, res) => {
     }
 
     const result = direction === 'forward'
-      ? await spotifySkipNext(accessToken, deviceId)
-      : await spotifySkipPrevious(accessToken, deviceId);
+      ? await spotifySkipNext(accessToken)
+      : await spotifySkipPrevious(accessToken);
 
     if (!result.success) {
       await logError(userId, 'PLAYBACK_SKIP_ERROR', result.error, req.path);
@@ -371,6 +371,46 @@ router.get('/state', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/playback/devices
+ * Get available Spotify devices
+ */
+router.get('/devices', async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+    const authResult = await getUserToken(userId);
+    if (!authResult.success) {
+      return res.status(authResult.status).json({ error: authResult.error });
+    }
+
+    const { user, accessToken } = authResult.data;
+
+    if (user.provider !== 'spotify') {
+      return res.status(400).json({
+        error: {
+          message: 'Unknown music provider',
+          code: 'UNKNOWN_PROVIDER',
+          retryable: false
+        }
+      });
+    }
+
+    const devices = await getSpotifyDevices(accessToken);
+    return res.json(devices);
+  } catch (error) {
+    console.error('Get devices error:', error);
+    await logError(req.query.userId, 'PLAYBACK_DEVICES_ERROR', error.message, req.path);
+    res.status(500).json({
+      error: {
+        message: 'Failed to get devices',
+        code: 'PLAYBACK_ERROR',
+        retryable: true
+      }
+    });
+  }
+});
+
 // ============================================
 // Spotify API Helper Functions
 // ============================================
@@ -381,15 +421,16 @@ router.get('/state', async (req, res) => {
 async function spotifyPlay(accessToken, { playlistId, trackUri, deviceId }) {
   try {
     const body = {};
-    
+
     if (playlistId) {
       body.context_uri = `spotify:playlist:${playlistId}`;
     }
-    
+
     if (trackUri) {
       body.uris = [trackUri];
     }
 
+    // Add device_id to URL if provided
     const url = deviceId
       ? `${SPOTIFY_API_BASE}/me/player/play?device_id=${deviceId}`
       : `${SPOTIFY_API_BASE}/me/player/play`;
@@ -410,7 +451,11 @@ async function spotifyPlay(accessToken, { playlistId, trackUri, deviceId }) {
 
     // Handle specific error cases
     if (response.status === 404) {
-      return { success: false, error: 'No active device found. Please open Spotify on a device.', status: 404 };
+      return {
+        success: false,
+        error: 'No active device found. Please open Spotify on a device or enable the web player.',
+        status: 404
+      };
     }
 
     const errorData = await response.json().catch(() => ({}));
@@ -427,11 +472,9 @@ async function spotifyPlay(accessToken, { playlistId, trackUri, deviceId }) {
 /**
  * Pause playback on Spotify
  */
-async function spotifyPause(accessToken, deviceId) {
+async function spotifyPause(accessToken) {
   try {
-    const url = deviceId
-      ? `${SPOTIFY_API_BASE}/me/player/pause?device_id=${deviceId}`
-      : `${SPOTIFY_API_BASE}/me/player/pause`;
+    const url = `${SPOTIFY_API_BASE}/me/player/pause`;
 
     const response = await fetch(url, {
       method: 'PUT',
@@ -463,12 +506,9 @@ async function spotifyPause(accessToken, deviceId) {
 /**
  * Seek to position on Spotify
  */
-async function spotifySeek(accessToken, positionMs, deviceId) {
+async function spotifySeek(accessToken, positionMs) {
   try {
-    let url = `${SPOTIFY_API_BASE}/me/player/seek?position_ms=${positionMs}`;
-    if (deviceId) {
-      url += `&device_id=${deviceId}`;
-    }
+    const url = `${SPOTIFY_API_BASE}/me/player/seek?position_ms=${positionMs}`;
 
     const response = await fetch(url, {
       method: 'PUT',
@@ -499,12 +539,9 @@ async function spotifySeek(accessToken, positionMs, deviceId) {
 /**
  * Skip to next track on Spotify
  */
-async function spotifySkipNext(accessToken, deviceId) {
+async function spotifySkipNext(accessToken) {
   try {
-    let url = `${SPOTIFY_API_BASE}/me/player/next`;
-    if (deviceId) {
-      url += `?device_id=${deviceId}`;
-    }
+    const url = `${SPOTIFY_API_BASE}/me/player/next`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -535,12 +572,9 @@ async function spotifySkipNext(accessToken, deviceId) {
 /**
  * Skip to previous track on Spotify
  */
-async function spotifySkipPrevious(accessToken, deviceId) {
+async function spotifySkipPrevious(accessToken) {
   try {
-    let url = `${SPOTIFY_API_BASE}/me/player/previous`;
-    if (deviceId) {
-      url += `?device_id=${deviceId}`;
-    }
+    const url = `${SPOTIFY_API_BASE}/me/player/previous`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -587,7 +621,8 @@ async function getSpotifyPlaybackState(accessToken) {
         position: 0,
         duration: 0,
         playlistId: null,
-        trackIndex: 0
+        trackIndex: 0,
+        device: null
       };
     }
 
@@ -637,6 +672,41 @@ async function getSpotifyPlaybackState(accessToken) {
       duration: 0,
       playlistId: null,
       trackIndex: 0,
+      error: error.message
+    };
+  }
+}
+
+/**
+ * Get available Spotify devices
+ */
+async function getSpotifyDevices(accessToken) {
+  try {
+    const response = await fetch(`${SPOTIFY_API_BASE}/me/player/devices`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get devices');
+    }
+
+    const data = await response.json();
+
+    return {
+      devices: data.devices.map(device => ({
+        id: device.id,
+        name: device.name,
+        type: device.type,
+        isActive: device.is_active,
+        volume: device.volume_percent
+      }))
+    };
+  } catch (error) {
+    console.error('Get Spotify devices error:', error);
+    return {
+      devices: [],
       error: error.message
     };
   }

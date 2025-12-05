@@ -30,7 +30,6 @@ export function usePlaylists(userId) {
 
     setLoading(true);
     setError(null);
-    console.log(userId)
 
     try {
       const response = await fetch(

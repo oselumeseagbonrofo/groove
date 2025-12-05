@@ -2,18 +2,20 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { 
-  Header, 
-  NavigationMenu, 
-  VinylTurntable, 
-  PlaybackControls, 
-  TrackQueue, 
+import {
+  Header,
+  NavigationMenu,
+  VinylTurntable,
+  PlaybackControls,
+  TrackQueue,
   TrackInfo,
   QuickGuide
 } from '../components';
 import useSwipeGesture from '../hooks/useSwipeGesture';
 import { usePlayback } from '../hooks/usePlayback';
 import { usePlaylists } from '../hooks/usePlaylists';
+import { useAccessToken } from '../hooks/useAccessToken';
+import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
 
 /**
  * Now Playing Page - Main playback interface with vinyl turntable
@@ -25,9 +27,26 @@ export default function NowPlayingPage() {
   const playlistIdParam = searchParams.get('playlistId');
   const [showQuickGuide, setShowQuickGuide] = useState(false);
   const [isFirstVisit, setIsFirstVisit] = useState(false);
-  
+
+  // Store userId in sessionStorage when received from OAuth callback
+  useEffect(() => {
+    if (userId && typeof window !== 'undefined') {
+      sessionStorage.setItem('userId', userId);
+      const provider = searchParams.get('provider');
+      if (provider) {
+        sessionStorage.setItem('provider', provider);
+      }
+    }
+  }, [userId, searchParams]);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [playlist, setPlaylist] = useState(null);
+
+  // Get access token for Spotify Web Player
+  const { accessToken } = useAccessToken(userId);
+
+  // Initialize Spotify Web Player
+  const { deviceId, isReady, transferPlayback } = useSpotifyPlayer(accessToken);
 
   // Use real playback hook
   const {
@@ -83,10 +102,6 @@ export default function NowPlayingPage() {
     loadPlaylistData();
   }, [userId, playlistIdParam, fetchPlaylists, fetchPlaylist]);
 
-  // Fallback to empty playlist if none loaded
-  const displayPlaylist = playlist || {
-    id: null,
-    name: 'No Playlist',
   // Show Quick Guide on first visit
   useEffect(() => {
     const hasSeenGuide = localStorage.getItem('hasSeenQuickGuide');
@@ -96,6 +111,13 @@ export default function NowPlayingPage() {
       localStorage.setItem('hasSeenQuickGuide', 'true');
     }
   }, []);
+
+  // Fallback to empty playlist if none loaded
+  const displayPlaylist = playlist || {
+    id: null,
+    name: 'No Playlist',
+    tracks: []
+  }
 
   const currentTrackIndex = displayPlaylist.tracks.findIndex(
     track => track.id === currentTrack?.id
@@ -115,11 +137,17 @@ export default function NowPlayingPage() {
 
   const handlePlay = useCallback(async () => {
     try {
-      await play();
+      // Transfer playback to web player if ready
+      if (isReady && deviceId) {
+        await transferPlayback();
+        await play({ deviceId });
+      } else {
+        await play();
+      }
     } catch (error) {
       console.error('Play error:', error);
     }
-  }, [play]);
+  }, [play, isReady, deviceId, transferPlayback]);
 
   const handlePause = useCallback(async () => {
     try {
@@ -173,12 +201,17 @@ export default function NowPlayingPage() {
     const track = displayPlaylist.tracks[index];
     if (track) {
       try {
-        await play({ trackUri: track.uri });
+        if (isReady && deviceId) {
+          await transferPlayback();
+          await play({ trackUri: track.uri, deviceId });
+        } else {
+          await play({ trackUri: track.uri });
+        }
       } catch (error) {
         console.error('Track select error:', error);
       }
     }
-  }, [displayPlaylist.tracks, play]);
+  }, [displayPlaylist.tracks, play, isReady, deviceId, transferPlayback]);
 
   const handleViewAll = useCallback(() => {
     // Will navigate to full playlist view
@@ -234,8 +267,8 @@ export default function NowPlayingPage() {
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(to right, #FBFBFB, #D7D7D7)' }}>
       {/* Header with dark styling for Now Playing */}
-      <Header 
-        title="NOW PLAYING" 
+      <Header
+        title="NOW PLAYING"
         onMenuToggle={handleMenuToggle}
         isDark={true}
         onHelpClick={handleHelpClick}
@@ -249,23 +282,36 @@ export default function NowPlayingPage() {
         onClose={handleMenuClose}
       />
 
+      {/* Web Player Status */}
+      {isReady && deviceId && (
+        <div className="pt-14 px-4">
+          <div className="bg-green-500/20 border border-green-500 text-gray-800 px-4 py-2 rounded text-sm">
+            ✓ Web player ready - No Spotify app needed!
+          </div>
+        </div>
+      )}
+
       {/* Error Display */}
       {(playbackError || playlistError) && (
         <div className="pt-14 px-4">
           <div className="bg-red-500/20 border border-red-500 text-white px-4 py-3 rounded">
             <p className="font-semibold">Error</p>
             <p className="text-sm">{playbackError || playlistError}</p>
+            {!isReady && playbackError?.includes('device') && (
+              <p className="text-xs mt-2">
+                Tip: The web player is loading. If this persists, open Spotify on another device.
+              </p>
+            )}
           </div>
         </div>
       )}
 
       {/* Main Content Area - Responsive layout: stacked on mobile, side-by-side on desktop */}
       {/* Swipe gesture handlers applied for track navigation (Requirements: 8.5) */}
-      <main 
-        className="pt-14 sm:pt-16 px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 safe-area-bottom max-w-7xl mx-auto swipe-container"
+      <main
+        className="pt-14 sm:pt-16 px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 safe-area-bottom max-w-7xl mx-auto"
         {...swipeHandlers}
       >
-      <main className="pt-40 sm:pt-24 px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 safe-area-bottom max-w-7xl mx-auto">
         {/* Desktop: Two-column layout */}
         <div className="lg:flex lg:gap-8 lg:items-start lg:pt-4">
           {/* Left Column: Turntable and Controls */}
@@ -318,9 +364,8 @@ export default function NowPlayingPage() {
           </div>
         </div>
       </main>
-</main>
       {/* Quick Guide Overlay */}
       <QuickGuide isOpen={showQuickGuide} onClose={handleCloseGuide} autoClose={isFirstVisit} />
-    </div>
+    </div >
   );
 }

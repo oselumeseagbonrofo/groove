@@ -20,11 +20,11 @@ export default function VinylTurntable({
   currentTrack = null,
   isPlaying = false,
   progress = 0,
-  onSeek = () => {},
-  onPlay = () => {},
-  onPause = () => {},
-  onSkipForward = () => {},
-  onSkipBackward = () => {}
+  onSeek = () => { },
+  onPlay = () => { },
+  onPause = () => { },
+  onSkipForward = () => { },
+  onSkipBackward = () => { }
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [swipeStart, setSwipeStart] = useState(null);
@@ -81,7 +81,7 @@ export default function VinylTurntable({
     if (swipeStart && isDragging) {
       const deltaX = e.clientX - swipeStart.x;
       const threshold = 50; // minimum swipe distance
-      
+
       if (Math.abs(deltaX) > threshold) {
         if (deltaX > 0) {
           // Swipe right - previous track
@@ -120,7 +120,7 @@ export default function VinylTurntable({
       const touch = e.changedTouches[0];
       const deltaX = touch.clientX - swipeStart.x;
       const threshold = 50; // minimum swipe distance
-      
+
       if (Math.abs(deltaX) > threshold) {
         if (deltaX > 0) {
           // Swipe right - previous track
@@ -138,25 +138,27 @@ export default function VinylTurntable({
   // Get cover image from playlist or use default
   const coverImage = playlist?.coverImage || currentTrack?.albumArt || null;
 
+  // Get track name to display beneath turntable
+  const trackName = currentTrack?.name || null;
+
   return (
     <div className="flex flex-col items-center w-full">
       {/* Turntable Base - Responsive sizing for mobile/tablet/desktop */}
       <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96">
         {/* Turntable Platform - Image background */}
         <div className="absolute inset-0">
-          <img 
-            src="/turntable-base.png" 
-            alt="Turntable base" 
+          <img
+            src="/turntable-base.png"
+            alt="Turntable base"
             className="w-full h-full object-contain"
           />
         </div>
-        
+
         {/* Vinyl Record */}
         <div
           ref={vinylRef}
-          className={`absolute inset-8 rounded-full bg-black shadow-xl cursor-pointer select-none ${
-            isPlaying ? 'animate-spin-vinyl' : ''
-          }`}
+          className={`absolute inset-8 rounded-full bg-black shadow-xl cursor-pointer select-none ${isPlaying ? 'animate-spin-vinyl' : ''
+            }`}
           style={{
             animationPlayState: isPlaying ? 'running' : 'paused'
           }}
@@ -205,9 +207,9 @@ export default function VinylTurntable({
           {/* Center Spindle */}
           <div className="absolute inset-0 m-auto w-3 h-3 rounded-full bg-gray-600 shadow-inner" />
         </div>
-        
+
         {/* Tonearm - Image */}
-        <div 
+        <div
           className="absolute -top-2 right-4 w-48 h-64 transition-transform duration-500 ease-out cursor-pointer"
           style={{
             transform: isPlaying ? 'rotate(0deg)' : 'rotate(-20deg)',
@@ -221,9 +223,9 @@ export default function VinylTurntable({
             }
           }}
         >
-          <img 
-            src="/tonearm.png" 
-            alt="Tonearm" 
+          <img
+            src="/tonearm.png"
+            alt="Tonearm"
             className="w-full h-full object-contain"
           />
         </div>

@@ -19,15 +19,15 @@ export default function MyShelfPage() {
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
-  
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const observerRef = useRef(null);
   const loadMoreRef = useRef(null);
 
-  // Get userId from URL params or localStorage
-  const userId = searchParams.get('userId') || 
-    (typeof window !== 'undefined' ? localStorage.getItem('groove_user_id') : null);
+  // Get userId from URL params or sessionStorage
+  const userId = searchParams.get('userId') ||
+    (typeof window !== 'undefined' ? sessionStorage.getItem('userId') : null);
 
   /**
    * Fetch playlists from API
@@ -48,7 +48,7 @@ export default function MyShelfPage() {
       setError(null);
 
       const response = await fetch(
-        `${API_BASE_URL}/api/playlists?userId=${userId}&limit=${PLAYLISTS_PER_PAGE}&offset=${currentOffset}`
+        `${API_BASE_URL}/playlists?userId=${userId}&limit=${PLAYLISTS_PER_PAGE}&offset=${currentOffset}`
       );
 
       if (!response.ok) {
@@ -146,8 +146,8 @@ export default function MyShelfPage() {
   return (
     <div className="min-h-screen bg-gradient-to-r from-[#FBFBFB] to-[#D5B4D8]">
       {/* Header */}
-      <Header 
-        title="MY SHELF" 
+      <Header
+        title="MY SHELF"
         onMenuToggle={handleMenuToggle}
         isDark={false}
       />
@@ -220,7 +220,7 @@ export default function MyShelfPage() {
 
             {/* Infinite Scroll Trigger */}
             {hasMore && (
-              <div 
+              <div
                 ref={loadMoreRef}
                 className="flex justify-center py-8"
               >

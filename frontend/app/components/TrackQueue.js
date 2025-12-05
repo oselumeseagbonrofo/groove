@@ -19,9 +19,10 @@
 export default function TrackQueue({
   tracks = [],
   currentIndex = 0,
-  onTrackSelect = () => {},
-  onViewAll = () => {},
-  maxVisible = 5
+  onTrackSelect = () => { },
+  onViewAll = () => { },
+  maxVisible = 5,
+  playlistName = null
 }) {
   // Get tracks from current index to end (the queue)
   const queuedTracks = tracks.slice(currentIndex);
@@ -39,6 +40,14 @@ export default function TrackQueue({
 
   return (
     <div className="backdrop-blur-sm rounded-xl p-3 sm:p-4 mx-auto max-w-md" style={{ backgroundColor: 'rgba(150, 39, 157, 0.3)' }}>
+      {/* Playlist Name - Display if available */}
+      {playlistName && (
+        <div className="mb-2 sm:mb-3 pb-2 border-b border-white/20">
+          <p className="text-white/70 text-xs">Playing from</p>
+          <p className="text-white font-semibold text-sm sm:text-base truncate">{playlistName}</p>
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-2 sm:mb-3">
         <h3 className="text-white font-semibold text-sm sm:text-base">Up Next</h3>
         {hasMoreTracks && (
@@ -60,16 +69,14 @@ export default function TrackQueue({
             <li key={track.id || actualIndex}>
               <button
                 onClick={() => onTrackSelect(actualIndex)}
-                className={`w-full flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-lg transition-colors touch-target ${
-                  isCurrent 
-                    ? 'bg-white/20' 
-                    : 'hover:bg-white/10 active:bg-white/15'
-                }`}
+                className={`w-full flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-lg transition-colors touch-target ${isCurrent
+                  ? 'bg-white/20'
+                  : 'hover:bg-white/10 active:bg-white/15'
+                  }`}
               >
                 {/* Track Number or Playing Indicator */}
-                <span className={`w-5 sm:w-6 text-center text-xs sm:text-sm flex-shrink-0 ${
-                  isCurrent ? '' : 'text-white/50'
-                }`} style={isCurrent ? { color: '#96279d' } : {}}>
+                <span className={`w-5 sm:w-6 text-center text-xs sm:text-sm flex-shrink-0 ${isCurrent ? '' : 'text-white/50'
+                  }`} style={isCurrent ? { color: '#96279d' } : {}}>
                   {isCurrent ? (
                     <svg className="w-3 h-3 sm:w-4 sm:h-4 mx-auto" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M8 5v14l11-7z" />
@@ -81,9 +88,8 @@ export default function TrackQueue({
 
                 {/* Track Info */}
                 <div className="flex-1 min-w-0 text-left">
-                  <p className={`text-xs sm:text-sm font-medium truncate ${
-                    isCurrent ? 'text-white' : 'text-white/90'
-                  }`}>
+                  <p className={`text-xs sm:text-sm font-medium truncate ${isCurrent ? 'text-white' : 'text-white/90'
+                    }`}>
                     {track.name || 'Unknown Track'}
                   </p>
                   <p className="text-xs text-white/60 truncate">

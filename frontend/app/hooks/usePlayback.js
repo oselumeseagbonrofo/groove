@@ -19,12 +19,11 @@ export function usePlayback(userId) {
   const [duration, setDuration] = useState(0); // Track duration in ms
   const [playlistId, setPlaylistId] = useState(null);
   const [trackIndex, setTrackIndex] = useState(0);
-  const [device, setDevice] = useState(null);
-  
+
   // UI state
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Refs for progress tracking
   const progressIntervalRef = useRef(null);
   const lastSyncTimeRef = useRef(Date.now());
@@ -47,13 +46,14 @@ export function usePlayback(userId) {
 
     try {
       const response = await fetch(`${API_BASE_URL}/playback/state?userId=${userId}`);
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error?.message || 'Failed to fetch playback state');
       }
 
       const state = await response.json();
+      console.log("sts", state)
 
       setIsPlaying(state.isPlaying);
       setCurrentTrack(state.currentTrack);
@@ -61,7 +61,6 @@ export function usePlayback(userId) {
       setDuration(state.duration);
       setPlaylistId(state.playlistId);
       setTrackIndex(state.trackIndex);
-      setDevice(state.device || null);
       lastSyncTimeRef.current = Date.now();
 
       return state;
@@ -96,7 +95,7 @@ export function usePlayback(userId) {
           userId,
           playlistId: options.playlistId,
           trackUri: options.trackUri,
-          deviceId: device?.id,
+          deviceId: options.deviceId,
         }),
       });
 
@@ -106,17 +105,12 @@ export function usePlayback(userId) {
       }
 
       const result = await response.json();
-      
-      // Handle client-side playback
-      if (result.clientSide) {
-        return result;
-      }
 
       setIsPlaying(true);
-      
+
       // Refresh state after a short delay to get updated track info
       setTimeout(() => fetchPlaybackState(), 500);
-      
+
       return result;
     } catch (err) {
       setError(err.message);
@@ -124,7 +118,7 @@ export function usePlayback(userId) {
     } finally {
       setLoading(false);
     }
-  }, [userId, device, fetchPlaybackState]);
+  }, [userId, fetchPlaybackState]);
 
   /**
    * Pause playback
@@ -147,7 +141,6 @@ export function usePlayback(userId) {
         },
         body: JSON.stringify({
           userId,
-          deviceId: device?.id,
         }),
       });
 
@@ -157,11 +150,8 @@ export function usePlayback(userId) {
       }
 
       const result = await response.json();
-      
-      if (!result.clientSide) {
-        setIsPlaying(false);
-      }
-      
+      setIsPlaying(false);
+
       return result;
     } catch (err) {
       setError(err.message);
@@ -169,7 +159,7 @@ export function usePlayback(userId) {
     } finally {
       setLoading(false);
     }
-  }, [userId, device]);
+  }, [userId]);
 
   /**
    * Seek to position in current track
@@ -200,7 +190,6 @@ export function usePlayback(userId) {
         body: JSON.stringify({
           userId,
           positionMs,
-          deviceId: device?.id,
         }),
       });
 
@@ -210,12 +199,9 @@ export function usePlayback(userId) {
       }
 
       const result = await response.json();
-      
-      if (!result.clientSide) {
-        setPosition(positionMs);
-        lastSyncTimeRef.current = Date.now();
-      }
-      
+      setPosition(positionMs);
+      lastSyncTimeRef.current = Date.now();
+
       return result;
     } catch (err) {
       setError(err.message);
@@ -223,7 +209,7 @@ export function usePlayback(userId) {
     } finally {
       setLoading(false);
     }
-  }, [userId, device, duration]);
+  }, [userId, duration]);
 
 
   /**
@@ -252,7 +238,6 @@ export function usePlayback(userId) {
         body: JSON.stringify({
           userId,
           direction: 'forward',
-          deviceId: device?.id,
         }),
       });
 
@@ -262,10 +247,10 @@ export function usePlayback(userId) {
       }
 
       const result = await response.json();
-      
+
       // Refresh state to get new track info
       setTimeout(() => fetchPlaybackState(), 500);
-      
+
       return result;
     } catch (err) {
       setError(err.message);
@@ -273,7 +258,7 @@ export function usePlayback(userId) {
     } finally {
       setLoading(false);
     }
-  }, [userId, device, fetchPlaybackState]);
+  }, [userId, fetchPlaybackState]);
 
   /**
    * Skip to previous track or restart current track
@@ -306,7 +291,6 @@ export function usePlayback(userId) {
           body: JSON.stringify({
             userId,
             positionMs: 0,
-            deviceId: device?.id,
           }),
         });
 
@@ -316,12 +300,12 @@ export function usePlayback(userId) {
         }
 
         const result = await response.json();
-        
+
         if (!result.clientSide) {
           setPosition(0);
           lastSyncTimeRef.current = Date.now();
         }
-        
+
         return result;
       }
 
@@ -334,7 +318,6 @@ export function usePlayback(userId) {
         body: JSON.stringify({
           userId,
           direction: 'backward',
-          deviceId: device?.id,
         }),
       });
 
@@ -344,10 +327,10 @@ export function usePlayback(userId) {
       }
 
       const result = await response.json();
-      
+
       // Refresh state to get new track info
       setTimeout(() => fetchPlaybackState(), 500);
-      
+
       return result;
     } catch (err) {
       setError(err.message);
@@ -355,7 +338,7 @@ export function usePlayback(userId) {
     } finally {
       setLoading(false);
     }
-  }, [userId, device, fetchPlaybackState]);
+  }, [userId, fetchPlaybackState]);
 
 
   /**
@@ -375,14 +358,13 @@ export function usePlayback(userId) {
       // Update progress every 100ms for smooth animation
       progressIntervalRef.current = setInterval(() => {
         setPosition((prevPosition) => {
-          const elapsed = Date.now() - lastSyncTimeRef.current;
           const newPosition = prevPosition + 100;
-          
+
           // Don't exceed duration
           if (newPosition >= duration) {
             return duration;
           }
-          
+
           return newPosition;
         });
       }, 100);
@@ -445,10 +427,9 @@ export function usePlayback(userId) {
     currentTime,
     playlistId,
     trackIndex,
-    device,
     loading,
     error,
-    
+
     // Actions
     play,
     pause,
@@ -457,7 +438,7 @@ export function usePlayback(userId) {
     skipBackward,
     loadPlaylist,
     fetchPlaybackState,
-    
+
     // Utilities
     clearError: () => setError(null),
   };

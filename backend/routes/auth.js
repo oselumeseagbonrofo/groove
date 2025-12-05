@@ -19,7 +19,8 @@ const SPOTIFY_SCOPES = [
   'playlist-modify-private',
   'user-read-playback-state',
   'user-modify-playback-state',
-  'user-read-currently-playing'
+  'user-read-currently-playing',
+  'streaming' // Required for Web Playback SDK
 ].join(' ');
 
 // Generate random state for OAuth security
@@ -37,7 +38,7 @@ router.post('/spotify', (req, res) => {
   try {
     const state = generateState();
     pendingStates.set(state, { provider: 'spotify', timestamp: Date.now() });
-    
+
     // Clean up old states (older than 10 minutes)
     const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
     for (const [key, value] of pendingStates.entries()) {
@@ -56,7 +57,7 @@ router.post('/spotify', (req, res) => {
     });
 
     const authUrl = `${SPOTIFY_AUTH_URL}?${params.toString()}`;
-    
+
     res.json({ authUrl, state });
   } catch (error) {
     console.error('Spotify auth initiation error:', error);
@@ -294,7 +295,7 @@ router.post('/refresh', async (req, res) => {
     }
 
     const refreshResult = await refreshSpotifyToken(tokenData.refresh_token);
-    
+
     if (!refreshResult.success) {
       return res.status(401).json({
         error: {
@@ -307,7 +308,7 @@ router.post('/refresh', async (req, res) => {
 
     // Update tokens in Supabase
     const newExpiresAt = new Date(Date.now() + refreshResult.expiresIn * 1000).toISOString();
-    
+
     await supabase
       .from('auth_tokens')
       .update({
@@ -362,7 +363,7 @@ async function refreshSpotifyToken(refreshToken) {
     }
 
     const data = await response.json();
-    
+
     return {
       success: true,
       accessToken: data.access_token,
@@ -422,6 +423,58 @@ router.post('/logout', async (req, res) => {
       error: {
         message: 'Logout failed',
         code: 'LOGOUT_ERROR',
+        retryable: true
+      }
+    });
+  }
+});
+
+/**
+ * GET /api/auth/token
+ * Get access token for client-side use (Web Playback SDK)
+ */
+router.get('/token/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const { data: tokenData, error: tokenError } = await supabase
+      .from('auth_tokens')
+      .select('access_token, expires_at')
+      .eq('user_id', userId)
+      .single();
+
+    if (tokenError || !tokenData) {
+      return res.status(404).json({
+        error: {
+          message: 'No token found',
+          code: 'TOKEN_NOT_FOUND',
+          retryable: false
+        }
+      });
+    }
+
+    // Check if token is expired
+    if (new Date(tokenData.expires_at) < new Date()) {
+      return res.status(401).json({
+        error: {
+          message: 'Token expired',
+          code: 'TOKEN_EXPIRED',
+          retryable: false
+        }
+      });
+    }
+
+    res.json({
+      accessToken: tokenData.access_token,
+      expiresAt: tokenData.expires_at
+    });
+
+  } catch (error) {
+    console.error('Get token error:', error);
+    res.status(500).json({
+      error: {
+        message: 'Failed to get token',
+        code: 'TOKEN_ERROR',
         retryable: true
       }
     });

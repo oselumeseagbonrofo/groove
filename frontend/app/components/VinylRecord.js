@@ -77,13 +77,6 @@ export default function VinylRecord({
         {/* Center Spindle Hole */}
         <div className="absolute inset-0 m-auto w-2 h-2 rounded-full bg-gray-800 shadow-inner" />
       </div>
-
-      {/* Playlist Name Tooltip on Hover */}
-      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-        <span className="text-xs text-gray-700 whitespace-nowrap max-w-24 truncate block text-center">
-          {playlist?.name || 'Untitled'}
-        </span>
-      </div>
     </button>
   );
 }
