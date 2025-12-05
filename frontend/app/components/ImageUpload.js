@@ -31,17 +31,17 @@ export function validateImageFile(file) {
 
   // Check MIME type
   if (!ALLOWED_TYPES.includes(file.type)) {
-    return { 
-      valid: false, 
-      error: 'Invalid file format. Please upload a JPEG or PNG image.' 
+    return {
+      valid: false,
+      error: 'Invalid file format. Please upload a JPEG or PNG image.'
     };
   }
 
   // Check file size
   if (file.size > MAX_FILE_SIZE) {
-    return { 
-      valid: false, 
-      error: 'File too large. Maximum size is 4MB.' 
+    return {
+      valid: false,
+      error: 'File too large. Maximum size is 4MB.'
     };
   }
 
@@ -49,9 +49,9 @@ export function validateImageFile(file) {
 }
 
 export default function ImageUpload({
-  onImageUpload = () => {},
-  onError = () => {},
-  onClose = () => {},
+  onImageUpload = () => { },
+  onError = () => { },
+  onClose = () => { },
   isUploading = false
 }) {
   const [isDragging, setIsDragging] = useState(false);
@@ -78,7 +78,7 @@ export default function ImageUpload({
 
   const processFile = useCallback((file) => {
     const validation = validateImageFile(file);
-    
+
     if (!validation.valid) {
       onError(validation.error);
       return;
@@ -160,18 +160,19 @@ export default function ImageUpload({
           onDragLeave={handleDragLeave}
           onDragOver={handleDragOver}
           onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
-            isDragging 
-              ? 'border-teal-primary bg-teal-primary/5' 
+          className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${isDragging
+              ? 'border-teal-primary bg-teal-primary/5'
               : 'border-gray-300 hover:border-gray-400'
-          }`}
+            }`}
         >
           {preview ? (
             <div className="space-y-4">
               <div className="w-32 h-32 mx-auto rounded-lg overflow-hidden shadow-md">
-                <Image 
-                  src={preview} 
-                  alt="Preview" 
+                <Image
+                  src={preview}
+                  width={250}
+                  height={250}
+                  alt="Preview"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -188,17 +189,17 @@ export default function ImageUpload({
             </div>
           ) : (
             <>
-              <svg 
-                className="w-12 h-12 mx-auto text-gray-400 mb-4" 
-                fill="none" 
-                stroke="currentColor" 
+              <svg
+                className="w-12 h-12 mx-auto text-gray-400 mb-4"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={1.5} 
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" 
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
               <p className="text-gray-600 mb-2">

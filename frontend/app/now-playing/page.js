@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { 
   Header, 
   NavigationMenu, 
@@ -10,37 +11,86 @@ import {
   TrackInfo 
 } from '../components';
 import useSwipeGesture from '../hooks/useSwipeGesture';
+import { usePlayback } from '../hooks/usePlayback';
+import { usePlaylists } from '../hooks/usePlaylists';
 
 /**
  * Now Playing Page - Main playback interface with vinyl turntable
  * Requirements: 3.1, 6.4, 9.2, 10.1
  */
 export default function NowPlayingPage() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('userId');
+  const playlistIdParam = searchParams.get('playlistId');
   
-  // Playback state - will be connected to usePlayback hook in Task 8
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [playlist, setPlaylist] = useState(null);
 
-  // Mock playlist data - will be replaced with real data from API
-  const [playlist] = useState({
-    id: 'demo-playlist',
-    name: 'Demo Playlist',
+  // Use real playback hook
+  const {
+    isPlaying,
+    currentTrack,
+    progress,
+    currentTime,
+    duration,
+    play,
+    pause,
+    seek,
+    skipForward,
+    skipBackward,
+    loadPlaylist,
+    loading: playbackLoading,
+    error: playbackError
+  } = usePlayback(userId);
+
+  // Use playlists hook to fetch playlist data
+  const {
+    playlists,
+    fetchPlaylists,
+    fetchPlaylist,
+    loading: playlistLoading,
+    error: playlistError
+  } = usePlaylists(userId);
+
+  // Load playlist data on mount
+  useEffect(() => {
+    async function loadPlaylistData() {
+      if (!userId) return;
+
+      // If playlistId is provided in URL, load that playlist directly
+      if (playlistIdParam) {
+        const playlistData = await fetchPlaylist(playlistIdParam);
+        if (playlistData) {
+          setPlaylist(playlistData);
+        }
+        return;
+      }
+
+      // Otherwise, fetch all playlists and load the first one
+      const allPlaylists = await fetchPlaylists();
+      if (allPlaylists && allPlaylists.length > 0) {
+        const firstPlaylistId = allPlaylists[0].id;
+        const playlistData = await fetchPlaylist(firstPlaylistId);
+        if (playlistData) {
+          setPlaylist(playlistData);
+        }
+      }
+    }
+
+    loadPlaylistData();
+  }, [userId, playlistIdParam, fetchPlaylists, fetchPlaylist]);
+
+  // Fallback to empty playlist if none loaded
+  const displayPlaylist = playlist || {
+    id: null,
+    name: 'No Playlist',
     coverImage: null,
-    tracks: [
-      { id: '1', name: 'Track One', artist: 'Artist A', duration: 210000 },
-      { id: '2', name: 'Track Two', artist: 'Artist B', duration: 185000 },
-      { id: '3', name: 'Track Three', artist: 'Artist C', duration: 240000 },
-      { id: '4', name: 'Track Four', artist: 'Artist D', duration: 195000 },
-      { id: '5', name: 'Track Five', artist: 'Artist E', duration: 220000 },
-      { id: '6', name: 'Track Six', artist: 'Artist F', duration: 175000 },
-    ]
-  });
+    tracks: []
+  };
 
-  const currentTrack = playlist.tracks[currentTrackIndex] || null;
-  const duration = currentTrack?.duration || 0;
+  const currentTrackIndex = displayPlaylist.tracks.findIndex(
+    track => track.id === currentTrack?.id
+  );
 
   const handleMenuToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -54,27 +104,34 @@ export default function NowPlayingPage() {
     console.log('Navigating to:', screen);
   };
 
-  const handlePlay = useCallback(() => {
-    setIsPlaying(true);
-  }, []);
+  const handlePlay = useCallback(async () => {
+    try {
+      await play();
+    } catch (error) {
+      console.error('Play error:', error);
+    }
+  }, [play]);
 
-  const handlePause = useCallback(() => {
-    setIsPlaying(false);
-  }, []);
+  const handlePause = useCallback(async () => {
+    try {
+      await pause();
+    } catch (error) {
+      console.error('Pause error:', error);
+    }
+  }, [pause]);
 
   /**
    * Property 6: Skip Forward Track Advancement
    * For any playlist with multiple tracks, tapping skip forward SHALL
    * increment the current track index by 1, wrapping to 0 when at the last track.
    */
-  const handleSkipForward = useCallback(() => {
-    setCurrentTrackIndex((prev) => {
-      const nextIndex = prev + 1;
-      return nextIndex >= playlist.tracks.length ? 0 : nextIndex;
-    });
-    setProgress(0);
-    setCurrentTime(0);
-  }, [playlist.tracks.length]);
+  const handleSkipForward = useCallback(async () => {
+    try {
+      await skipForward();
+    } catch (error) {
+      console.error('Skip forward error:', error);
+    }
+  }, [skipForward]);
 
   /**
    * Property 7: Skip Backward Behavior
@@ -82,39 +139,37 @@ export default function NowPlayingPage() {
    * (a) restart the current track if elapsed time > 3 seconds, or
    * (b) go to the previous track if elapsed time <= 3 seconds
    */
-  const handleSkipBackward = useCallback((shouldRestart) => {
-    if (shouldRestart) {
-      // Restart current track
-      setProgress(0);
-      setCurrentTime(0);
-    } else {
-      // Go to previous track
-      setCurrentTrackIndex((prev) => {
-        const prevIndex = prev - 1;
-        return prevIndex < 0 ? playlist.tracks.length - 1 : prevIndex;
-      });
-      setProgress(0);
-      setCurrentTime(0);
+  const handleSkipBackward = useCallback(async (shouldRestart) => {
+    try {
+      await skipBackward(shouldRestart);
+    } catch (error) {
+      console.error('Skip backward error:', error);
     }
-  }, [playlist.tracks.length]);
+  }, [skipBackward]);
 
   /**
    * Property 5: Seek Position Mapping
    * For any drag/scrub position on the vinyl record (0-100%),
    * the seek position SHALL map proportionally to the current track's duration.
    */
-  const handleSeek = useCallback((seekPercentage) => {
-    setProgress(seekPercentage);
-    const seekTime = Math.floor((seekPercentage / 100) * duration);
-    setCurrentTime(seekTime);
-    // Will call playback API in Task 8
-  }, [duration]);
+  const handleSeek = useCallback(async (seekPercentage) => {
+    try {
+      await seek(seekPercentage);
+    } catch (error) {
+      console.error('Seek error:', error);
+    }
+  }, [seek]);
 
-  const handleTrackSelect = useCallback((index) => {
-    setCurrentTrackIndex(index);
-    setProgress(0);
-    setCurrentTime(0);
-  }, []);
+  const handleTrackSelect = useCallback(async (index) => {
+    const track = displayPlaylist.tracks[index];
+    if (track) {
+      try {
+        await play({ trackUri: track.uri });
+      } catch (error) {
+        console.error('Track select error:', error);
+      }
+    }
+  }, [displayPlaylist.tracks, play]);
 
   const handleViewAll = useCallback(() => {
     // Will navigate to full playlist view
@@ -126,15 +181,20 @@ export default function NowPlayingPage() {
    * Swipe left to skip forward, swipe right to skip backward
    */
   const handleSwipeLeft = useCallback(() => {
-    // Swipe left = skip forward to next track
     handleSkipForward();
   }, [handleSkipForward]);
 
   const handleSwipeRight = useCallback(() => {
     // Swipe right = skip backward (always go to previous track on swipe)
-    // Using false to go to previous track rather than restart
     handleSkipBackward(false);
   }, [handleSkipBackward]);
+
+  // Load playlist if playlistId is provided
+  useEffect(() => {
+    if (playlistIdParam && userId) {
+      loadPlaylist(playlistIdParam);
+    }
+  }, [playlistIdParam, userId, loadPlaylist]);
 
   const swipeHandlers = useSwipeGesture({
     onSwipeLeft: handleSwipeLeft,
@@ -142,6 +202,17 @@ export default function NowPlayingPage() {
     threshold: 50,
     maxVerticalMovement: 100
   });
+
+  // Show loading state
+  if (!userId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-purple-dark via-pink-medium to-lavender flex items-center justify-center">
+        <div className="text-white text-center">
+          <p className="text-lg">Please log in to continue</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-dark via-pink-medium to-lavender">
@@ -160,6 +231,16 @@ export default function NowPlayingPage() {
         onClose={handleMenuClose}
       />
 
+      {/* Error Display */}
+      {(playbackError || playlistError) && (
+        <div className="pt-14 px-4">
+          <div className="bg-red-500/20 border border-red-500 text-white px-4 py-3 rounded">
+            <p className="font-semibold">Error</p>
+            <p className="text-sm">{playbackError || playlistError}</p>
+          </div>
+        </div>
+      )}
+
       {/* Main Content Area - Responsive layout: stacked on mobile, side-by-side on desktop */}
       {/* Swipe gesture handlers applied for track navigation (Requirements: 8.5) */}
       <main 
@@ -173,7 +254,7 @@ export default function NowPlayingPage() {
             {/* Vinyl Turntable - Centered with responsive sizing */}
             <div className="flex justify-center py-2 sm:py-4">
               <VinylTurntable
-                playlist={playlist}
+                playlist={displayPlaylist}
                 currentTrack={currentTrack}
                 isPlaying={isPlaying}
                 progress={progress}
@@ -185,7 +266,7 @@ export default function NowPlayingPage() {
             <TrackInfo
               track={currentTrack}
               progress={progress}
-              currentTime={currentTime}
+              currentTime={currentTime * 1000}
               duration={duration}
             />
 
@@ -193,7 +274,7 @@ export default function NowPlayingPage() {
             <div className="py-3 sm:py-4">
               <PlaybackControls
                 isPlaying={isPlaying}
-                currentTime={currentTime / 1000} // Convert to seconds for 3-second threshold
+                currentTime={currentTime}
                 onPlay={handlePlay}
                 onPause={handlePause}
                 onSkipForward={handleSkipForward}
@@ -205,8 +286,8 @@ export default function NowPlayingPage() {
           {/* Right Column: Track Queue (visible on desktop) */}
           <div className="mt-3 sm:mt-4 lg:mt-0 lg:w-80 xl:w-96 lg:sticky lg:top-20">
             <TrackQueue
-              tracks={playlist.tracks}
-              currentIndex={currentTrackIndex}
+              tracks={displayPlaylist.tracks}
+              currentIndex={currentTrackIndex >= 0 ? currentTrackIndex : 0}
               onTrackSelect={handleTrackSelect}
               onViewAll={handleViewAll}
               maxVisible={8}

@@ -15,12 +15,12 @@ import Image from 'next/image';
  * @param {number} props.progress - Playback progress (0-100)
  * @param {Function} props.onSeek - Callback when user seeks to position
  */
-export default function VinylTurntable({ 
-  playlist = null, 
-  currentTrack = null, 
-  isPlaying = false, 
+export default function VinylTurntable({
+  playlist = null,
+  currentTrack = null,
+  isPlaying = false,
   progress = 0,
-  onSeek = () => {}
+  onSeek = () => { }
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const vinylRef = useRef(null);
@@ -40,7 +40,7 @@ export default function VinylTurntable({
     // Calculate angle from center
     const deltaX = clientX - centerX;
     const deltaY = clientY - centerY;
-    
+
     // Calculate distance from center (normalized 0-1)
     const maxRadius = rect.width / 2;
     const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -60,7 +60,7 @@ export default function VinylTurntable({
   const handleMouseDown = useCallback((e) => {
     e.preventDefault();
     setIsDragging(true);
-    
+
     const seekPosition = calculateSeekPosition(e.clientX, e.clientY);
     if (seekPosition !== null) {
       onSeek(seekPosition);
@@ -69,7 +69,7 @@ export default function VinylTurntable({
 
   const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
-    
+
     const seekPosition = calculateSeekPosition(e.clientX, e.clientY);
     if (seekPosition !== null) {
       onSeek(seekPosition);
@@ -85,7 +85,7 @@ export default function VinylTurntable({
     // when user is interacting with the vinyl for seeking
     e.stopPropagation();
     setIsDragging(true);
-    
+
     const touch = e.touches[0];
     const seekPosition = calculateSeekPosition(touch.clientX, touch.clientY);
     if (seekPosition !== null) {
@@ -95,7 +95,7 @@ export default function VinylTurntable({
 
   const handleTouchMove = useCallback((e) => {
     if (!isDragging) return;
-    
+
     const touch = e.touches[0];
     const seekPosition = calculateSeekPosition(touch.clientX, touch.clientY);
     if (seekPosition !== null) {
@@ -116,13 +116,12 @@ export default function VinylTurntable({
       <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96">
         {/* Turntable Platform */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg shadow-2xl" />
-        
+
         {/* Vinyl Record */}
         <div
           ref={vinylRef}
-          className={`absolute inset-4 rounded-full bg-black shadow-xl cursor-pointer select-none ${
-            isPlaying ? 'animate-spin-vinyl' : ''
-          }`}
+          className={`absolute inset-4 rounded-full bg-black shadow-xl cursor-pointer select-none ${isPlaying ? 'animate-spin-vinyl' : ''
+            }`}
           style={{
             animationPlayState: isPlaying ? 'running' : 'paused'
           }}
@@ -142,20 +141,22 @@ export default function VinylTurntable({
           <div className="absolute inset-10 rounded-full border border-gray-800" />
           <div className="absolute inset-12 rounded-full border border-gray-800" />
           <div className="absolute inset-14 rounded-full border border-gray-800" />
-          
+
           {/* Progress Indicator Ring */}
-          <div 
+          <div
             className="absolute inset-3 rounded-full"
             style={{
               background: `conic-gradient(from 0deg, rgba(0, 188, 212, 0.3) ${progress}%, transparent ${progress}%)`
             }}
           />
-          
+
           {/* Center Label - Shows playlist cover or default Groove logo */}
           <div className="absolute inset-0 m-auto w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full overflow-hidden shadow-inner">
             {coverImage ? (
-              <Image 
-                src={coverImage} 
+              <Image
+                width={250}
+                height={250}
+                src={coverImage}
                 alt={playlist?.name || 'Album cover'}
                 className="w-full h-full object-cover"
               />
@@ -165,21 +166,21 @@ export default function VinylTurntable({
               </div>
             )}
           </div>
-          
+
           {/* Center Spindle */}
           <div className="absolute inset-0 m-auto w-3 h-3 rounded-full bg-gray-600 shadow-inner" />
         </div>
-        
+
         {/* Tonearm */}
         <div className="absolute top-4 right-4 w-2 h-32 origin-top">
-          <div 
+          <div
             className="w-full h-full bg-gradient-to-b from-gray-400 to-gray-600 rounded-full transform transition-transform duration-300"
             style={{
               transform: isPlaying ? 'rotate(25deg)' : 'rotate(0deg)'
             }}
           />
           {/* Tonearm Head */}
-          <div 
+          <div
             className="absolute -bottom-1 -left-1 w-4 h-4 bg-gray-500 rounded transition-transform duration-300"
             style={{
               transform: isPlaying ? 'rotate(25deg)' : 'rotate(0deg)'

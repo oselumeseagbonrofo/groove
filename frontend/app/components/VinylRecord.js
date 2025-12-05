@@ -19,11 +19,11 @@ export default function VinylRecord({
   playlist = {},
   vinylColor = null,
   customImageUrl = null,
-  onClick = () => {}
+  onClick = () => { }
 }) {
   // Determine the label image: custom image > playlist cover > default Groove logo
   const labelImage = customImageUrl || playlist?.coverImage || null;
-  
+
   // Determine vinyl color (default to black)
   const recordColor = vinylColor || '#1a1a1a';
 
@@ -41,7 +41,7 @@ export default function VinylRecord({
       aria-label={`Play ${playlist?.name || 'playlist'}`}
     >
       {/* Vinyl Record Outer Ring */}
-      <div 
+      <div
         className="absolute inset-0 rounded-full shadow-lg"
         style={{ backgroundColor: recordColor }}
       >
@@ -52,15 +52,17 @@ export default function VinylRecord({
         <div className="absolute inset-4 rounded-full border border-gray-700 opacity-25" />
         <div className="absolute inset-5 rounded-full border border-gray-700 opacity-20" />
         <div className="absolute inset-6 rounded-full border border-gray-700 opacity-15" />
-        
+
         {/* Vinyl Shine Effect */}
         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-        
+
         {/* Center Label */}
         <div className="absolute inset-0 m-auto w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full overflow-hidden shadow-inner">
           {hasValidCover ? (
-            <Image 
-              src={labelImage} 
+            <Image
+              width={250}
+              height={250}
+              src={labelImage}
               alt={playlist?.name || 'Playlist cover'}
               className="w-full h-full object-cover"
             />
@@ -71,11 +73,11 @@ export default function VinylRecord({
             </div>
           )}
         </div>
-        
+
         {/* Center Spindle Hole */}
         <div className="absolute inset-0 m-auto w-2 h-2 rounded-full bg-gray-800 shadow-inner" />
       </div>
-      
+
       {/* Playlist Name Tooltip on Hover */}
       <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
         <span className="text-xs text-gray-700 whitespace-nowrap max-w-24 truncate block text-center">

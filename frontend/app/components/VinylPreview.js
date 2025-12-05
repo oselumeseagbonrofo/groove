@@ -47,7 +47,7 @@ export default function VinylPreview({
   return (
     <div className="flex flex-col items-center">
       {/* Vinyl Record */}
-      <div 
+      <div
         className={`${sizeClasses[size]} rounded-full shadow-2xl relative`}
         style={{ backgroundColor: '#1a1a1a' }}
         role="img"
@@ -59,25 +59,27 @@ export default function VinylPreview({
         <div className="absolute inset-6 rounded-full border border-gray-700 opacity-30" />
         <div className="absolute inset-8 rounded-full border border-gray-700 opacity-25" />
         <div className="absolute inset-10 rounded-full border border-gray-700 opacity-20" />
-        
+
         {/* Vinyl Shine Effect */}
         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/10 via-transparent to-transparent" />
-        
+
         {/* Center Label */}
-        <div 
+        <div
           className={`absolute inset-0 m-auto ${labelSizeClasses[size]} rounded-full overflow-hidden shadow-inner flex items-center justify-center transition-all duration-200`}
           style={{ backgroundColor: hasImage || hasGradient ? undefined : color }}
         >
           {hasImage ? (
             /* Display selected image */
-            <Image 
-              src={image.url || image.previewUrl} 
+            <Image
+              width={250}
+              height={250}
+              src={image.url || image.previewUrl}
               alt={image.name || 'Custom label'}
               className="w-full h-full object-cover"
             />
           ) : hasGradient ? (
             /* Display gradient preset */
-            <div 
+            <div
               className={`w-full h-full bg-gradient-to-br ${image.gradient} flex items-center justify-center`}
             >
               <span className={`text-white font-bold ${textSizeClasses[size]}`}>
@@ -91,7 +93,7 @@ export default function VinylPreview({
             </span>
           )}
         </div>
-        
+
         {/* Center Spindle Hole */}
         <div className="absolute inset-0 m-auto w-2 h-2 rounded-full bg-gray-800 shadow-inner" />
       </div>
