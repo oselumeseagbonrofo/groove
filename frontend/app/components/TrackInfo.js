@@ -25,7 +25,9 @@ export default function TrackInfo({
   if (!track) {
     return (
       <div className="text-center py-3 sm:py-4">
-        <p className="text-white/60 text-xs sm:text-sm">No track playing</p>
+        <p className="text-xs sm:text-sm" style={{ color: '#8C2E96' }}>
+          No track playing - Press play to start
+        </p>
       </div>
     );
   }
@@ -36,7 +38,7 @@ export default function TrackInfo({
       <h2 className="text-base sm:text-lg md:text-xl font-semibold truncate px-3 sm:px-4" style={{ color: '#8C2E96' }}>
         {track.name || 'Unknown Track'}
       </h2>
-      
+
       {/* Artist Name */}
       <p className="text-xs sm:text-sm md:text-base mt-0.5 sm:mt-1 truncate px-3 sm:px-4" style={{ color: '#8C2E96' }}>
         {track.artist || 'Unknown Artist'}
@@ -45,12 +47,12 @@ export default function TrackInfo({
       {/* Progress Bar - Touch-friendly height */}
       <div className="mt-3 sm:mt-4 px-3 sm:px-4">
         <div className="relative h-1.5 sm:h-1 rounded-full overflow-hidden" style={{ backgroundColor: '#d3d3d3' }}>
-          <div 
+          <div
             className="absolute left-0 top-0 h-full rounded-full transition-all duration-300"
             style={{ width: `${Math.min(100, Math.max(0, progress))}%`, backgroundColor: '#2d1b4e' }}
           />
         </div>
-        
+
         {/* Time Display */}
         <div className="flex justify-between mt-1.5 sm:mt-2 text-xs" style={{ color: '#2d1b4e' }}>
           <span>{formatTime(currentTime)}</span>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Header, NavigationMenu, VinylShelf } from '../components';
 
@@ -12,6 +12,31 @@ const PLAYLISTS_PER_PAGE = 20;
  * Requirements: 2.1, 2.2, 2.6, 6.5, 9.3, 9.6, 10.1
  */
 export default function MyShelfPage() {
+  return (
+    <Suspense fallback={<MyShelfLoading />}>
+      <MyShelfContent />
+    </Suspense>
+  );
+}
+
+/**
+ * Loading fallback for Suspense boundary
+ */
+function MyShelfLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-r from-[#FBFBFB] to-[#D5B4D8]">
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="w-16 h-16 rounded-full border-4 border-purple-medium border-t-transparent animate-spin mb-4" />
+        <p className="text-gray-600">Loading your collection...</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * My Shelf Content - Contains the actual page logic with useSearchParams
+ */
+function MyShelfContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [playlists, setPlaylists] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

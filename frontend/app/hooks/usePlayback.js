@@ -56,7 +56,8 @@ export function usePlayback(userId) {
       }
 
       const state = await response.json();
-      console.log("sts", state)
+      console.log("Playback state received:", state);
+      console.log("Current track:", state.currentTrack);
 
       setIsPlaying(state.isPlaying);
       setCurrentTrack(state.currentTrack);

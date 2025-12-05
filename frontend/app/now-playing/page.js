@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Header,
@@ -22,6 +22,31 @@ import { useSpotifyPlayer } from '../hooks/useSpotifyPlayer';
  * Requirements: 3.1, 6.4, 9.2, 10.1
  */
 export default function NowPlayingPage() {
+  return (
+    <Suspense fallback={<NowPlayingLoading />}>
+      <NowPlayingContent />
+    </Suspense>
+  );
+}
+
+/**
+ * Loading fallback for Suspense boundary
+ */
+function NowPlayingLoading() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-purple-dark via-pink-medium to-lavender flex items-center justify-center">
+      <div className="text-white text-center">
+        <div className="w-16 h-16 rounded-full border-4 border-white border-t-transparent animate-spin mb-4 mx-auto" />
+        <p className="text-lg">Loading player...</p>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Now Playing Content - Contains the actual page logic with useSearchParams
+ */
+function NowPlayingContent() {
   const searchParams = useSearchParams();
   const userId = searchParams.get('userId');
   const playlistIdParam = searchParams.get('playlistId');
@@ -84,6 +109,10 @@ export default function NowPlayingPage() {
         const playlistData = await fetchPlaylist(playlistIdParam);
         if (playlistData) {
           setPlaylist(playlistData);
+          // Auto-play the first track if we have tracks
+          if (playlistData.tracks && playlistData.tracks.length > 0) {
+            await loadPlaylist(playlistIdParam);
+          }
         }
         return;
       }
@@ -95,12 +124,16 @@ export default function NowPlayingPage() {
         const playlistData = await fetchPlaylist(firstPlaylistId);
         if (playlistData) {
           setPlaylist(playlistData);
+          // Auto-play the first track if we have tracks
+          if (playlistData.tracks && playlistData.tracks.length > 0) {
+            await loadPlaylist(firstPlaylistId);
+          }
         }
       }
     }
 
     loadPlaylistData();
-  }, [userId, playlistIdParam, fetchPlaylists, fetchPlaylist]);
+  }, [userId, playlistIdParam, fetchPlaylists, fetchPlaylist, loadPlaylist]);
 
   // Show Quick Guide on first visit
   useEffect(() => {
