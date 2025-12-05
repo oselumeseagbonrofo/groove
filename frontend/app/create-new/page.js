@@ -63,7 +63,9 @@ export default function CreateNewPage() {
         console.log('Custom image upload would happen here');
       }
 
-      const response = await fetch('/api/playlists', {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
+      const response = await fetch(`${API_BASE_URL}/playlists`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
