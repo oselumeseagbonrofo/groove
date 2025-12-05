@@ -44,7 +44,12 @@ export default function PlaybackControls({
       {/* Skip Backward Button - Touch-friendly minimum 44px */}
       <button
         onClick={handleSkipBackward}
-        className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 active:scale-95 flex items-center justify-center transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-white/50 touch-target"
+        className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full active:scale-95 flex items-center justify-center transition-all duration-150 focus:outline-none focus:ring-2 touch-target"
+        style={{ backgroundColor: '#9E9E9E' }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#BDBDBD'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#9E9E9E'}
+        onMouseDown={(e) => e.currentTarget.style.backgroundColor = '#757575'}
+        onMouseUp={(e) => e.currentTarget.style.backgroundColor = '#BDBDBD'}
         aria-label="Skip backward"
       >
         <svg 
@@ -59,7 +64,16 @@ export default function PlaybackControls({
       {/* Play/Pause Button - Larger touch target for primary action */}
       <button
         onClick={handlePlayPause}
-        className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full bg-teal-primary hover:bg-teal-primary/90 active:bg-teal-primary/80 active:scale-95 flex items-center justify-center transition-all duration-150 shadow-lg focus:outline-none focus:ring-2 focus:ring-teal-primary/50 focus:ring-offset-2 focus:ring-offset-transparent"
+        className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full active:scale-95 flex items-center justify-center transition-all duration-150 shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent"
+        style={{
+          backgroundColor: '#b149c2',
+          '&:hover': { backgroundColor: '#a03db3' },
+          '&:active': { backgroundColor: '#8f35a0' }
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#a03db3'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#b149c2'}
+        onMouseDown={(e) => e.currentTarget.style.backgroundColor = '#8f35a0'}
+        onMouseUp={(e) => e.currentTarget.style.backgroundColor = '#a03db3'}
         aria-label={isPlaying ? 'Pause' : 'Play'}
       >
         {isPlaying ? (
@@ -86,7 +100,12 @@ export default function PlaybackControls({
       {/* Skip Forward Button - Touch-friendly minimum 44px */}
       <button
         onClick={onSkipForward}
-        className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/40 active:scale-95 flex items-center justify-center transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-white/50 touch-target"
+        className="w-11 h-11 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full active:scale-95 flex items-center justify-center transition-all duration-150 focus:outline-none focus:ring-2 touch-target"
+        style={{ backgroundColor: '#9E9E9E' }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#BDBDBD'}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#9E9E9E'}
+        onMouseDown={(e) => e.currentTarget.style.backgroundColor = '#757575'}
+        onMouseUp={(e) => e.currentTarget.style.backgroundColor = '#BDBDBD'}
         aria-label="Skip forward"
       >
         <svg 

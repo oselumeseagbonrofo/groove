@@ -19,9 +19,14 @@ export default function VinylTurntable({
   currentTrack = null, 
   isPlaying = false, 
   progress = 0,
-  onSeek = () => {}
+  onSeek = () => {},
+  onPlay = () => {},
+  onPause = () => {},
+  onSkipForward = () => {},
+  onSkipBackward = () => {}
 }) {
   const [isDragging, setIsDragging] = useState(false);
+  const [swipeStart, setSwipeStart] = useState(null);
   const vinylRef = useRef(null);
 
   /**
@@ -59,12 +64,8 @@ export default function VinylTurntable({
   const handleMouseDown = useCallback((e) => {
     e.preventDefault();
     setIsDragging(true);
-    
-    const seekPosition = calculateSeekPosition(e.clientX, e.clientY);
-    if (seekPosition !== null) {
-      onSeek(seekPosition);
-    }
-  }, [calculateSeekPosition, onSeek]);
+    setSwipeStart({ x: e.clientX, y: e.clientY });
+  }, []);
 
   const handleMouseMove = useCallback((e) => {
     if (!isDragging) return;
@@ -75,20 +76,31 @@ export default function VinylTurntable({
     }
   }, [isDragging, calculateSeekPosition, onSeek]);
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback((e) => {
+    if (swipeStart && isDragging) {
+      const deltaX = e.clientX - swipeStart.x;
+      const threshold = 50; // minimum swipe distance
+      
+      if (Math.abs(deltaX) > threshold) {
+        if (deltaX > 0) {
+          // Swipe right - previous track
+          onSkipBackward(false);
+        } else {
+          // Swipe left - next track
+          onSkipForward();
+        }
+      }
+    }
     setIsDragging(false);
-  }, []);
+    setSwipeStart(null);
+  }, [swipeStart, isDragging, onSkipForward, onSkipBackward]);
 
   const handleTouchStart = useCallback((e) => {
     e.preventDefault();
     setIsDragging(true);
-    
     const touch = e.touches[0];
-    const seekPosition = calculateSeekPosition(touch.clientX, touch.clientY);
-    if (seekPosition !== null) {
-      onSeek(seekPosition);
-    }
-  }, [calculateSeekPosition, onSeek]);
+    setSwipeStart({ x: touch.clientX, y: touch.clientY });
+  }, []);
 
   const handleTouchMove = useCallback((e) => {
     if (!isDragging) return;
@@ -100,9 +112,25 @@ export default function VinylTurntable({
     }
   }, [isDragging, calculateSeekPosition, onSeek]);
 
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = useCallback((e) => {
+    if (swipeStart && isDragging && e.changedTouches[0]) {
+      const touch = e.changedTouches[0];
+      const deltaX = touch.clientX - swipeStart.x;
+      const threshold = 50; // minimum swipe distance
+      
+      if (Math.abs(deltaX) > threshold) {
+        if (deltaX > 0) {
+          // Swipe right - previous track
+          onSkipBackward(false);
+        } else {
+          // Swipe left - next track
+          onSkipForward();
+        }
+      }
+    }
     setIsDragging(false);
-  }, []);
+    setSwipeStart(null);
+  }, [swipeStart, isDragging, onSkipForward, onSkipBackward]);
 
   // Get cover image from playlist or use default
   const coverImage = playlist?.coverImage || currentTrack?.albumArt || null;
@@ -111,13 +139,19 @@ export default function VinylTurntable({
     <div className="flex flex-col items-center w-full">
       {/* Turntable Base - Responsive sizing for mobile/tablet/desktop */}
       <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96">
-        {/* Turntable Platform */}
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg shadow-2xl" />
+        {/* Turntable Platform - Image background */}
+        <div className="absolute inset-0">
+          <img 
+            src="/turntable-base.png" 
+            alt="Turntable base" 
+            className="w-full h-full object-contain"
+          />
+        </div>
         
         {/* Vinyl Record */}
         <div
           ref={vinylRef}
-          className={`absolute inset-4 rounded-full bg-black shadow-xl cursor-pointer select-none ${
+          className={`absolute inset-8 rounded-full bg-black shadow-xl cursor-pointer select-none ${
             isPlaying ? 'animate-spin-vinyl' : ''
           }`}
           style={{
@@ -157,8 +191,8 @@ export default function VinylTurntable({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-purple-medium to-lavender flex items-center justify-center">
-                <span className="text-white text-2xl md:text-3xl font-bold">G</span>
+              <div className="w-full h-full flex items-center justify-center" style={{ background: 'radial-gradient(circle, #9e30a9 0%, #a73caf 25%, #b049bf 50%, #7a2283 75%, #0a0047 100%)', paddingBottom: '8px' }}>
+                <span className="text-4xl md:text-5xl font-bold" style={{ fontFamily: "'DM Bubble Pop', sans-serif", color: '#0a0047' }}>G</span>
               </div>
             )}
           </div>
@@ -167,20 +201,25 @@ export default function VinylTurntable({
           <div className="absolute inset-0 m-auto w-3 h-3 rounded-full bg-gray-600 shadow-inner" />
         </div>
         
-        {/* Tonearm */}
-        <div className="absolute top-4 right-4 w-2 h-32 origin-top">
-          <div 
-            className="w-full h-full bg-gradient-to-b from-gray-400 to-gray-600 rounded-full transform transition-transform duration-300"
-            style={{
-              transform: isPlaying ? 'rotate(25deg)' : 'rotate(0deg)'
-            }}
-          />
-          {/* Tonearm Head */}
-          <div 
-            className="absolute -bottom-1 -left-1 w-4 h-4 bg-gray-500 rounded transition-transform duration-300"
-            style={{
-              transform: isPlaying ? 'rotate(25deg)' : 'rotate(0deg)'
-            }}
+        {/* Tonearm - Image */}
+        <div 
+          className="absolute -top-2 right-4 w-48 h-64 transition-transform duration-500 ease-out cursor-pointer"
+          style={{
+            transform: isPlaying ? 'rotate(0deg)' : 'rotate(-20deg)',
+            transformOrigin: '20% 18%'
+          }}
+          onClick={() => {
+            if (isPlaying) {
+              onPause();
+            } else {
+              onPlay();
+            }
+          }}
+        >
+          <img 
+            src="/tonearm.png" 
+            alt="Tonearm" 
+            className="w-full h-full object-contain"
           />
         </div>
       </div>

@@ -113,7 +113,7 @@ export default function CreateNewPage() {
 
       {/* Main Content Area - Requirements: 9.4 (light gray/white background) */}
       {/* Responsive max-width: mobile full, tablet centered, desktop wider */}
-      <main className="pt-14 sm:pt-16 px-3 sm:px-4 md:px-6 pb-6 sm:pb-8 max-w-lg md:max-w-xl lg:max-w-2xl mx-auto safe-area-bottom">
+      <main className="pt-24 sm:pt-16 px-3 sm:px-4 md:px-6 pb-32 sm:pb-40 max-w-lg md:max-w-xl lg:max-w-2xl mx-auto safe-area-bottom">
         {/* Success Message */}
         {successMessage && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">

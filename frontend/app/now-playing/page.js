@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { 
   Header, 
   NavigationMenu, 
   VinylTurntable, 
   PlaybackControls, 
   TrackQueue, 
-  TrackInfo 
+  TrackInfo,
+  QuickGuide
 } from '../components';
 
 /**
@@ -16,12 +17,24 @@ import {
  */
 export default function NowPlayingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showQuickGuide, setShowQuickGuide] = useState(false);
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
   
   // Playback state - will be connected to usePlayback hook in Task 8
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+
+  // Show Quick Guide on first visit
+  useEffect(() => {
+    const hasSeenGuide = localStorage.getItem('hasSeenQuickGuide');
+    if (!hasSeenGuide) {
+      setShowQuickGuide(true);
+      setIsFirstVisit(true);
+      localStorage.setItem('hasSeenQuickGuide', 'true');
+    }
+  }, []);
 
   // Mock playlist data - will be replaced with real data from API
   const [playlist] = useState({
@@ -120,13 +133,23 @@ export default function NowPlayingPage() {
     console.log('View all tracks');
   }, []);
 
+  const handleHelpClick = useCallback(() => {
+    setShowQuickGuide(true);
+    setIsFirstVisit(false); // Manual trigger, don't auto-close
+  }, []);
+
+  const handleCloseGuide = useCallback(() => {
+    setShowQuickGuide(false);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-dark via-pink-medium to-lavender">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(to right, #FBFBFB, #D7D7D7)' }}>
       {/* Header with dark styling for Now Playing */}
       <Header 
         title="NOW PLAYING" 
         onMenuToggle={handleMenuToggle}
         isDark={true}
+        onHelpClick={handleHelpClick}
       />
 
       {/* Navigation Menu */}
@@ -138,7 +161,7 @@ export default function NowPlayingPage() {
       />
 
       {/* Main Content Area - Responsive layout: stacked on mobile, side-by-side on desktop */}
-      <main className="pt-14 sm:pt-16 px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 safe-area-bottom max-w-7xl mx-auto">
+      <main className="pt-40 sm:pt-24 px-3 sm:px-4 md:px-6 lg:px-8 pb-6 sm:pb-8 safe-area-bottom max-w-7xl mx-auto">
         {/* Desktop: Two-column layout */}
         <div className="lg:flex lg:gap-8 lg:items-start lg:pt-4">
           {/* Left Column: Turntable and Controls */}
@@ -151,6 +174,10 @@ export default function NowPlayingPage() {
                 isPlaying={isPlaying}
                 progress={progress}
                 onSeek={handleSeek}
+                onPlay={handlePlay}
+                onPause={handlePause}
+                onSkipForward={handleSkipForward}
+                onSkipBackward={handleSkipBackward}
               />
             </div>
 
@@ -176,7 +203,7 @@ export default function NowPlayingPage() {
           </div>
 
           {/* Right Column: Track Queue (visible on desktop) */}
-          <div className="mt-3 sm:mt-4 lg:mt-0 lg:w-80 xl:w-96 lg:sticky lg:top-20">
+          <div className="mt-3 sm:mt-4 lg:mt-0 lg:w-80 xl:w-96 lg:sticky lg:top-20 lg:mx-auto">
             <TrackQueue
               tracks={playlist.tracks}
               currentIndex={currentTrackIndex}
@@ -187,6 +214,9 @@ export default function NowPlayingPage() {
           </div>
         </div>
       </main>
+
+      {/* Quick Guide Overlay */}
+      <QuickGuide isOpen={showQuickGuide} onClose={handleCloseGuide} autoClose={isFirstVisit} />
     </div>
   );
 }

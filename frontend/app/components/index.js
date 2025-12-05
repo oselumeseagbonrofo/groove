@@ -15,6 +15,7 @@ export { default as VinylTurntable } from './VinylTurntable';
 export { default as PlaybackControls } from './PlaybackControls';
 export { default as TrackQueue } from './TrackQueue';
 export { default as TrackInfo } from './TrackInfo';
+export { default as QuickGuide } from './QuickGuide';
 
 // Create New Components
 export { default as ColorPicker } from './ColorPicker';

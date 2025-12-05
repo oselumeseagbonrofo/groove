@@ -67,11 +67,13 @@ export default function NavigationMenu({ isOpen, currentScreen, onNavigate, onCl
         {/* Menu Header */}
         <div className="flex items-center justify-between p-4 border-b border-white/10">
           <div className="flex items-center gap-3">
-            {/* Mini Vinyl Logo */}
-            <div className="w-10 h-10 rounded-full bg-black relative">
-              <div className="absolute inset-0 m-auto w-4 h-4 rounded-full bg-gradient-to-br from-purple-medium to-lavender" />
-            </div>
-            <span className="text-white font-bold tracking-wider">GROOVE</span>
+            {/* Groove Logo */}
+            <img 
+              src="/groove.png" 
+              alt="Groove logo" 
+              className="w-10 h-10"
+            />
+            <span className="text-white font-bold tracking-wider" style={{ fontFamily: "'DM Bubble Pop', sans-serif" }}>GROOVE</span>
           </div>
           
           {/* Close Button */}
@@ -97,9 +99,14 @@ export default function NavigationMenu({ isOpen, currentScreen, onNavigate, onCl
                   onClick={() => handleNavigation(item.id)}
                   className={`flex items-center gap-4 px-6 py-4 transition-colors ${
                     isActive
-                      ? 'bg-white/10 text-teal-primary border-l-4 border-teal-primary'
+                      ? 'bg-white/10 border-l-4'
                       : 'text-white hover:bg-white/5'
                   }`}
+                  style={isActive ? { 
+                    color: '#b149c2', 
+                    borderLeftColor: '#b149c2',
+                    textShadow: '0 0 10px rgba(177, 73, 194, 0.6)'
+                  } : {}}
                 >
                   <Icon className="w-5 h-5" />
                   <span className="font-medium">{item.label}</span>
